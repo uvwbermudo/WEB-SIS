@@ -1,0 +1,52 @@
+{% extends "auth/base.html" %}
+
+
+{% block title %}Register{% endblock %}
+{% block body %}    
+<div class="container h-100 d-flex align-items-center justify-content-center">
+    <div class="container align-items-center bg-white w-50 p-5 pt-3 shadow-sm rounded-3">
+        <div class="container d-flex flex-column align-items-center justify-content-center">
+            <img class="img-fluid w-50" src="../../static/img/logo2.jpg" style="max-width: 150px; min-width: 100px;" alt="">
+            <br/>
+                <h5 class="text-muted">Create an account</h5>
+        </div>
+        <form method="POST">
+            {{ form.csrf_token }}
+            {{ form.email.label(class="form-label")}}
+            {{ form.email(class="form-control form-email")}}
+            {% for error in form.email.errors %}
+                <span class="msu-text">{{error}}</span>
+                <style>
+                    .form-email {border-color: red;}
+                </style>
+            {% endfor %}
+            <br/>
+
+            {{ form.password.label(class="form-label")}}
+            {{ form.password(class="form-control form-password")}}
+            {% for error in form.password.errors %}
+                <span class="msu-text">{{error}}</span>
+                <style>
+                    .form-password {border-color: red;}
+                </style>
+            {% endfor %}
+            <br/>
+            {{ form.password2.label(class="form-label")}}
+            {{ form.password2(class="form-control form-password2")}}
+            {% for error in form.password2.errors %}
+                <span class="msu-text">{{error}}</span>
+                <style>
+                    .form-password2 {border-color: red;}
+                </style>
+            {% endfor %}
+            <br/>
+            <div class="container p-0">
+            {{ form.submit(class="btn msuify-button") }}
+            <a href="/login" class="link p-2 msu-text-link">Already have an account?</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+{% endblock %}  

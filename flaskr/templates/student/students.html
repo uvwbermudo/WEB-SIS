@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Students
+{% endblock %}
+
+{% block studentpill%}
+msu-wrap
+{% endblock %}
+{% block studentpill2%}
+text-light
+{% endblock %}
+
+{% block body %}
+
+<div class="container w-75 ">
+  <div class="container mt-4 mb-0 w-100">
+      <form method="POST" action="/student-search" class="">
+          {{ form.csrf_token}}
+          <div class="row gx-5">
+            <div class="col-lg-2 p-1 d-flex justify-content-start">
+                <button class="btn btn-success shadow-sm w-100" type="button" data-bs-toggle="modal" data-bs-target="#addstudent"> Add Student</button>
+              </div>
+            
+            <div class="col-lg-2 p-1">
+              <a href="/students" class="btn btn-secondary w-100"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
+            </div>
+            <div class="col col-lg-3">
+            </div>
+            <div class="col-lg-3 p-1">
+              <input class="form-control shadow-sm" type="search" placeholder="Search a student" aria-label="Search" name="searchbar">
+            </div>
+            
+            <div class="col-lg-2 p-1">
+              <button class="btn btn-success shadow-sm btn-md w-100" type="submit"> Search</button>
+            </div>
+            
+          </div> 
+      </form>
+  </div>
+</div>
+
+<!-- ADD STUDENT -->
+<form action="/student-add" method="POST">
+  <div class="modal fade" id="addstudent" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Add a Student</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          
+          <div class="modal-body">
+              {{ form.csrf_token }}
+              {{ form.id.label(class="form-label") }}
+              {{ form.id(class="form-control") }}  
+              <br/>
+              {{ form.last_name.label(class="form-label") }}
+              {{ form.last_name(class="form-control") }} 
+              <br/>
+              {{ form.first_name.label(class="form-label") }}
+              {{ form.first_name(class="form-control") }}
+              <br/>
+              {{ form.year.label(class="form-label") }}
+              {{ form.year(class="form-select") }}
+              <br/>
+              {{ form.gender.label(class="form-label") }}
+              {{ form.gender(class="form-select") }}
+              <br/>
+              {{ form.course.label(class="form-label") }}
+              {{ form.course(class="form-select") }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            {{ form.submit(class="btn msuify-button")}}
+          </div>
+          
+        </div>
+      </div>
+  </div>
+</form>
+
+
+{% if students == None or students|length == 0 %}
+<div class="container d-flex justify-content-center pt-5">
+  <h1 class="text-muted display-5">No results</h1>
+</div>
+{% else %}
+
+<!-- Table -->
+<div class="container mt-3 bg-white rounded-5 py-2 shadow-sm">
+  <div class="table-responsive-md overflow-x-scroll">
+    <table class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 720px;">
+      <thead>
+  
+        <tr>
+          <th scope="col-2" class="py-3 ps-5">ID Number</th>
+          <th scope="col-5" class="py-3">Last Name</th>
+          <th scope="col-5" class="py-3">First Name </th>
+          <th scope="col-5" class="py-3">Course</th>
+          <th scope="col-5" class="py-3">Year Level</th>
+          <th scope="col-5" class="py-3">Gender</th>
+          
+
+        </tr>
+      
+      </thead>
+      <tbody class="table-group-divider">
+      {% for student in students %}
+      <tr>
+          <th scope="row" class="ps-5">{{ student.id }}</th>
+          <td>{{ student.last_name }}</td>
+          <td>{{ student.first_name }}</td>
+          <td>{{ student.course.course_name }}</td>
+          <td>{{ student.year }}</td>
+          <td>{{ student.gender }}</td>
+
+          <td class="pe-0">
+              <a href="/student-edit/{{student.id}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editstudent{{student.id}}" style="width: 120px;">Edit</a>
+
+              <a href="/student-delete/{{student.id}}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 120px;" data-bs-target="#confirmdelete{{student.id}}" data-bs-toggle="modal">Delete</a>
+
+          </td>
+      </tr>
+
+      <!-- EDIT MODAL -->
+      <form action="/student-edit" method="POST">
+        <div id="editstudent{{student.id}}" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Edit: {{student.last_name +', '+student.first_name}} </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  
+                  <div class="modal-body">
+                      <input type="hidden" value="{{ student.id }}" id="hid" name="hid" style="padding: 0;">
+                      
+                      {% set id, last_name, first_name, year, gender, course = student.id,student.last_name, student.first_name, student.year, student.gender, student.course_code %}
+
+                      {{ form.csrf_token }}
+                      {{ form.id.label(class="form-label") }}
+                      {{ form.id(class="form-control", value=id) }}  
+                      <br/>
+                      {{ form.last_name.label(class="form-label") }}
+                      {{ form.last_name(class="form-control", value=last_name) }} 
+                      <br/>
+                      {{ form.first_name.label(class="form-label") }}
+                      {{ form.first_name(class="form-control", value=first_name) }}
+                      <br/>
+                      {{ form.year.label(class="form-label") }}
+                      {{ form.year(class="form-select", value=year) }}
+                      <br/>
+                      {{ form.gender.label(class="form-label") }}
+                      {{ form.gender(class="form-select", value=gender) }}
+                      <br/>
+                      {{ form.course.label(class="form-label") }}
+                      {{ form.course(class="form-select", value=course) }}
+                  </div>
+                  
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" type="button" data-bs-target="#confirm{{student.id}}" data-bs-toggle="modal">Save</button>
+                  </div>
+                  
+
+                </div>
+              </div>
+        </div> 
+        
+        <!-- CONFIRM EDIT MODAL -->
+        <div class="modal fade" id="confirm{{student.id}}" aria-hidden="true" aria-labelledby="confirmChanges" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5">Confirm</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Submit Changes?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"  data-bs-target="#editcourse{{course.course_code}}" data-bs-toggle="modal">Back</button>
+                {{ form.submit(class="btn msuify-button")}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- CONFIRM DELETE MODAL -->
+      <div class="modal fade" id="confirmdelete{{student.id}}" aria-hidden="true" aria-labelledby="confirmChanges" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5">Confirm</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Delete {{ student.last_name+", "+student.first_name}}?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary me-0"
+              data-bs-dismiss="modal">Cancel</button>
+              
+              <form action="/student-delete" method="post" class="p-0 m-0">
+                {{form.csrf_token}}
+                <input type="hidden" name="hid" value="{{student.id}}">
+                <button type="submit" class="btn btn-secondary msuify-button"  >Confirm</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+      {% endfor %}
+        
+      </tbody>
+    </table>
+{% endif %}
+{% endblock %}

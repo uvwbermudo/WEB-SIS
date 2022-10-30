@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../../static/css/style.css">
+    <title>{% block title%}{% endblock%}</title>
+</head>
+    <!-- NAVBAR -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category == 'error' %}
+        <div class="alert alert-danger alert-dismissable fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button class="btn-close float-end" type="button" data-bs-dismiss="alert" aria-label="Close">
+            </button>
+        </div>
+        
+        {% else %}
+        <div class="alert alert-success alert-dismissable fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button class="btn-close float-end" type="button" data-bs-dismiss="alert" aria-label="Close">
+            </button>
+        </div>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    
+    <header>
+        <nav class="navbar bg-light navbar-expand-md p-2 fixed-top shadow-sm">
+            <div class="container-fluid align-content-center">
+                <a href="/" class="navbar-brand msu-text">
+                <img src="../../static/img/logo2.jpg" alt="MSU-IIT Logo" width="40" height="40" class="me-2">
+                My.SIS
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headnavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="headnavbar">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a href="/about" class="nav-link msu-text-link">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/logout" class="nav-link msu-text-link">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+                
+        </nav>
+    </header>
+    
+<body class="body-darkwhite before-space body-img2">
+    <!-- NAVBAR 2 -->
+    <div class="container px-1 py-1 mt-5 bg-white w-75 rounded-3 pill shadow-sm">
+        <ul class="nav nav-pills nav-fill">
+
+            <li class="nav-item {% block studentpill %}{% endblock %}">
+              <a class="nav-link {% block studentpill2 %}msu-text-link{% endblock %}" aria-current="page" href="/" id="studentspill">Students</a>
+            </li>
+
+            <li class="nav-item {% block coursespill %}{% endblock %}">
+              <a class="nav-link {% block coursespill2 %}msu-text-link{% endblock %}" href="/courses" id="coursespill">Courses</a>
+            </li>
+
+            <li class="nav-item {% block collegespill %}{% endblock %}">
+              <a class="nav-link {% block collegespill2 %}msu-text-link{% endblock %}" href="/colleges" id="collegespill">Colleges</a>
+            </li>
+          </ul>
+    </div>
+    {% block body %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <script src="../static/js/index.js"></script>
+
+</body>
+</html>

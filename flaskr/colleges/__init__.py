@@ -1,0 +1,99 @@
+from unicodedata import category
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
+from flask_login import current_user, login_user, login_required, logout_user
+from flaskr import db
+from .forms import AddCollege
+from .models import Colleges
+
+
+colleges_view = Blueprint('colleges_view', __name__)
+
+@colleges_view.route('/colleges', methods=['POST','GET'])
+@login_required
+def college_view():
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    form = AddCollege(request.form)
+    colleges = Colleges.query.all()
+
+    for college in colleges:
+        for i,course in enumerate(college.courses):
+            print(i, course)
+    
+    if 'from_search' in session and session['from_search'] == True:
+        session['from_search'] = False
+        search_filter = str(session['search_query'])
+        colleges = Colleges.query.filter(
+            Colleges.college_name.contains(search_filter) | 
+            Colleges.college_code.contains(search_filter)).all()
+    return render_template('colleges/colleges.html', form=form, colleges=colleges)
+
+@colleges_view.route('/college-add', methods=['POST'])
+@login_required
+def college_add():
+    form = AddCollege(request.form)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            college_name = request.form.get('college_name')
+            college_code = request.form.get('college_code')
+            check = Colleges.query.get(college_code)
+            if check:
+                flash(f'ERROR: College code "{college_code}" already in use', category='error')
+                print(check)
+            else:
+                new_college = Colleges(college_name=college_name,college_code=college_code)
+
+                db.session.add(new_college)
+                db.session.commit()
+                flash(f'Successfully added "{new_college.college_code} - {new_college.college_name}"')
+        else:
+            for fieldName, errorMessages in form.errors.items():
+                for err in errorMessages:
+                    flash(f'{err}', category='error')
+        
+    return redirect(url_for('colleges_view.college_view'))
+
+@colleges_view.route('/college-edit', methods=['POST'])
+@login_required
+def college_edit():
+    form = AddCollege(request.form)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            new_code = request.form.get('college_code')
+            college_code = request.form.get('hid')
+            check = Colleges.query.get(new_code)
+            if check and check.college_code != college_code:
+                flash(f'ERROR: College code "{new_code}" already in use', category='error')
+            else:
+                new_name = request.form.get('college_name')
+                
+                target = Colleges.query.filter(Colleges.college_code==college_code).first()
+                target.college_code = new_code
+                target.college_name = new_name
+                db.session.commit()
+            return redirect(url_for('colleges_view.college_view'))
+        else:
+            for fieldName, errorMessages in form.errors.items():
+                for err in errorMessages:
+                    flash(f'{err}', category='error')
+
+@colleges_view.route('/college-delete', methods=['POST','GET'])
+@login_required
+def college_delete():
+    if request.method == 'POST':
+        target = request.form.get('hid')
+        target = Colleges.query.get(target)
+        db.session.delete(target)
+        db.session.commit()
+        flash(f'Deleted "{target.college_name}" successfully', category='success')
+    return redirect(url_for('colleges_view.college_view'))
+
+@colleges_view.route('/college-search', methods=['POST','GET'])
+@login_required
+def college_search():
+    session['from_search'] = True
+    session['search_query'] = request.form.get('searchbar')
+    return redirect(url_for('colleges_view.college_view'))
+
+        
+

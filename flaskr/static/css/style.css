@@ -1,0 +1,68 @@
+.msuify-button {
+    background-color: #a41d21;
+    color: white;
+}
+
+.msuify-button:hover {
+    background-color: maroon;
+    color: white;
+}
+.msu-wrap {
+    background-color: #a41d21;
+    color: white;
+    border-radius: 8px;
+}
+.msu-text-link, .msu-text-link:active, .msu-text-link:visited {
+    color: #a41d21;
+    text-decoration: none;
+}
+
+a.nav-link.active {
+    color:white;
+    background-color: #a41d21;
+}
+
+.msu-text-link:hover {
+    color: maroon;
+}
+
+.msu-text, .msu-text:hover, .msu-text:active, .msu-text:visited {
+    color: #a41d21;
+}
+
+#data-table tfoot {
+    padding: 10%;
+}
+
+.alert {
+    position: absolute;
+    align-self: center;
+    margin-left: 12.5%;
+    width: 75%;
+}
+html{
+    height: 100%
+}
+
+.body-img {
+    background-image: url('../img/msubg2.jpg');
+    background-size: cover;
+    background-repeat: repeat-y;
+    height: 100%;
+}
+
+.body-img2 {
+    background-image: url('../img/msubg3.jpg');
+    background-size: cover;
+    background-repeat: reapeat-y;
+    height: 100%;
+}
+.body-darkwhite {
+    background-color: #f0f0f0;
+}
+
+.before-space::before {
+    display: block;
+    content: '';
+    height:80px;
+}
