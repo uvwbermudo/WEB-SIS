@@ -1,38 +1,42 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from flask_login import current_user, login_user, login_required, logout_user
 from flaskr import db
-from flaskr.student.models import Students
+from .models import Students
 from .forms import AddStudent
 from flaskr.courses.models import Courses
 
 student_view = Blueprint('student_view', __name__)
 
+
+def searchbar_query(filter, search_query):  
+    if filter == 'id':
+        return Students.query.filter(Students.id.contains(search_query)).all()
+    elif filter == 'name':
+        return Students.query.filter(Students.last_name.contains(search_query) |
+        Students.first_name.contains(search_query)).all()
+    else:
+        return Students.query.filter(Students.id.contains(search_query)|
+        Students.last_name.contains(search_query)|
+        Students.first_name.contains(search_query)).all()
+
+        
+
 @student_view.route('/students')
 @login_required
 def students():
-    x=Students.query.all()
-
-    for stud in x:
-        print(stud.last_name)
-        print(stud.course.course_name)
-
-
     form = AddStudent(request.form)
     courses = Courses.query.all()
     courses = [(course.course_code,course.course_name) for course in courses]
     form.course.choices = courses
     session['course_choices'] = courses
     students = Students.query.all()
+
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
     
     if 'from_search' in session and session['from_search'] == True:
         session['from_search'] = False
-        search_filter = str(session['search_query'])
-        students = Students.query.filter(
-            Students.last_name.contains(search_filter) | 
-            Students.first_name.contains(search_filter) |
-            Students.id.contains(search_filter)).all()
+        students = searchbar_query(session['search_filter'],session['search_query'])
 
     
     return render_template('student/students.html', form=form, students=students)
@@ -96,7 +100,7 @@ def student_edit():
                 target.course_code = new_course_code
 
                 db.session.commit()
-                flash(f'Successfully updated student: {", ".join([new_last_name, new_first_name])}!', category='success')
+                flash(f'Successfully updated student: {target}!', category='success')
         else:
             for fieldName, errorMessages in form.errors.items():
                 for err in errorMessages:
@@ -120,4 +124,5 @@ def student_search():
     if request.method == 'POST':
         session['from_search'] = True
         session['search_query'] = request.form.get('searchbar')
+        session['search_filter'] = request.form.get('searchfield')
         return redirect(url_for('student_view.students'))

@@ -27,10 +27,21 @@ text-light
               <div class="col-lg-2 p-1">
                 <a href="/courses" class="btn btn-secondary w-100"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
               </div>
-              <div class="col col-lg-3">
+              <div class="col col-lg-1">
               </div>
-              <div class="col-lg-3 p-1">
-                <input class="form-control shadow-sm" type="search" placeholder="Search a Course" aria-label="Search" name="searchbar">
+              <div class="col-lg-5 p-1">
+                <div class="row">
+                  <div class="col-3 p-0">
+                    <select name="searchfield" id="" class="form-select">
+                      <option selected> Filter by</option>
+                      <option value="course_code">Course Code</option>
+                      <option value="course_name">Name</option>
+                    </select>
+                  </div>
+                  <div class="col-9 p-0 px-1 pe-2">
+                    <input class="form-control shadow-sm" type="search" placeholder="Search a Course" aria-label="Search" name="searchbar">
+                  </div>
+              </div>
               </div>
               
               <div class="col-lg-2 p-1">
@@ -60,11 +71,18 @@ text-light
               {{ form.course_name(class="form-control") }} 
               <br/>
               {{ form.college.label(class="form-label") }}
+              {% if form.college.choices|length > 0 %}
               {{ form.college(class="form-select") }}
+              {% else %}
+              <input type="text" class="form-control" disabled="true", placeholder="No available colleges at the moment">
+              {% endif %}
+
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            {% if form.college.choices|length > 0 %}
             {{ form.submit(class="btn msuify-button")}}
+            {% endif %}
           </div>
           </form>
         </div>
@@ -96,7 +114,11 @@ text-light
       <tr>
           <th scope="row" class="ps-5">{{ course.course_code }}</th>
           <td>{{ course.course_name }}</td>
+          {% if course.college %}
           <td>{{ course.college.college_name }}</td>
+          {% else %}
+          <td> <p class="fst-italic fw-light my-auto h-50">College Removed</p> </td>
+          {% endif %}
           <script>
           </script>
           <td class="pe-0">
@@ -129,12 +151,18 @@ text-light
                       {{ form.course_name(class="form-control", value=course_name) }} 
                       <br/>
                       {{ form.college.label(class="form-label")}}
+                      {% if form.college.choices|length > 0 %}
                       {{ form.college(class="form-control", value=college)}}
+                      {% else %}
+                            <input type="text" class="form-control" disabled="true", placeholder="No available colleges at the moment">
+                      {% endif %}
                   </div>
                   
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    {% if form.college.choices|length > 0 %}
                     <button class="btn btn-success" type="button" data-bs-target="#confirm{{course.course_code}}" data-bs-toggle="modal">Save</button>
+                    {% endif %}
                   </div>
                   
 
@@ -155,7 +183,9 @@ text-light
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"  data-bs-target="#editcourse{{course.course_code}}" data-bs-toggle="modal">Back</button>
+                {% if form.college.choices|length > 0 %}
                 {{ form.submit(class="btn msuify-button")}}
+                {% endif %}
               </div>
             </div>
           </div>

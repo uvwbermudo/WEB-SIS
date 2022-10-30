@@ -6,15 +6,16 @@ from wtforms import StringField, validators, SubmitField, SelectField
 
 class AddCourse(FlaskForm):
     course_code = StringField('Course Code', 
-    [validators.Length(min=1, max=50), 
-    validators.DataRequired(message='Course Code is required'), validators.Regexp('\A\w+( \w+)*\Z', message='Cannot Submit, Invalid format for Course Code. (Can\'t start with spaces)')])
+    [validators.Length(min=1, max=20), 
+    validators.DataRequired(message='Course Code is required'), validators.Regexp('\A\w+( \w+)*\Z', message='Cannot Submit, Invalid format for Course Code. (Unnecessary Space)')],
+    render_kw={'placeholder':"e.g. 'BSCS'"})
 
     course_name = StringField('Course Name',
-    [validators.Length(min=1, max=50), 
+    [validators.Length(min=1, max=100), 
     validators.DataRequired(message='Course Name is required'),
-     validators.Regexp('\A\w+( \w+)*\Z', message='Cannot Submit, Invalid Format for Course Name. (Can\'t start with spaces)')])
+     validators.Regexp('\A\w+( \w+)*\Z', message='Cannot Submit, Invalid Format for Course Name. (Unnecessary Space)')])
 
-    college = SelectField('College Origin', [validators.Length(min=2, max=50), validators.DataRequired()])
+    college = SelectField('College Origin', [validators.DataRequired()])
 
     submit = SubmitField("Submit")
 

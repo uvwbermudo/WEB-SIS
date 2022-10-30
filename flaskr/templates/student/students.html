@@ -25,10 +25,22 @@ text-light
             <div class="col-lg-2 p-1">
               <a href="/students" class="btn btn-secondary w-100"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
             </div>
-            <div class="col col-lg-3">
+
+            <div class="col col-lg-1">
             </div>
-            <div class="col-lg-3 p-1">
-              <input class="form-control shadow-sm" type="search" placeholder="Search a student" aria-label="Search" name="searchbar">
+            <div class="container col-lg-5 p-1">
+              <div class="row">
+                  <div class="col-3 p-0">
+                    <select name="searchfield" id="" class="form-select">
+                      <option selected> Filter by</option>
+                      <option value="id">ID</option>
+                      <option value="name">Name</option>
+                    </select>
+                  </div>
+                  <div class="col-9 p-0 px-1 pe-2">
+                    <input class="form-control shadow-sm" type="search" placeholder="Search a student" aria-label="Search" name="searchbar">
+                  </div>
+              </div>
             </div>
             
             <div class="col-lg-2 p-1">
@@ -68,11 +80,17 @@ text-light
               {{ form.gender(class="form-select") }}
               <br/>
               {{ form.course.label(class="form-label") }}
+              {% if form.course.choices|length > 0 %}
               {{ form.course(class="form-select") }}
+              {% else %}
+              <input type="text" class="form-control", disabled=True, placeholder="No available courses at the moment.">
+              {% endif %}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            {% if form.course.choices|length > 0 %}
             {{ form.submit(class="btn msuify-button")}}
+            {% endif %}
           </div>
           
         </div>
@@ -111,7 +129,11 @@ text-light
           <th scope="row" class="ps-5">{{ student.id }}</th>
           <td>{{ student.last_name }}</td>
           <td>{{ student.first_name }}</td>
+          {% if student.course %}
           <td>{{ student.course.course_name }}</td>
+          {% else %}
+          <td> <p class="fst-italic fw-light my-auto h-50">Course Removed</p> </td>
+          {% endif %}
           <td>{{ student.year }}</td>
           <td>{{ student.gender }}</td>
 
@@ -155,12 +177,18 @@ text-light
                       {{ form.gender(class="form-select", value=gender) }}
                       <br/>
                       {{ form.course.label(class="form-label") }}
+                      {% if form.course.choices|length > 0 %}
                       {{ form.course(class="form-select", value=course) }}
+                      {% else %}
+                      <input type="text" class="form-control" disabled=True, placeholder="No available courses at the moment.">
+                      {% endif %}
                   </div>
                   
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    {% if form.course.choices|length > 0 %}
                     <button class="btn btn-success" type="button" data-bs-target="#confirm{{student.id}}" data-bs-toggle="modal">Save</button>
+                    {% endif %}
                   </div>
                   
 
@@ -181,7 +209,9 @@ text-light
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"  data-bs-target="#editcourse{{course.course_code}}" data-bs-toggle="modal">Back</button>
+                {% if form.course.choices|length > 0 %}
                 {{ form.submit(class="btn msuify-button")}}
+                {% endif %}
               </div>
             </div>
           </div>
@@ -213,9 +243,12 @@ text-light
         </div>
       </div>
     </form>
-      {% endfor %}
-        
+    
+    {% endfor %}
       </tbody>
     </table>
+  </div>
+</div>
+<br/>
 {% endif %}
 {% endblock %}

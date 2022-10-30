@@ -8,9 +8,9 @@ class Students(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     year = db.Column(db.Integer(), nullable=False)
     gender = db.Column(db.String(6), nullable=False)
-    course_code = db.Column(db.String(20), db.ForeignKey('courses.course_code'), nullable=False)
+    course_code = db.Column(db.String(20), db.ForeignKey('courses.course_code', ondelete="SET DEFAULT"), nullable=True, server_default="TEST DEFAULT")
 
     course = db.relationship('Courses', back_populates="students")
 
     def __repr__(self):
-        return f"{self.id}, {self.last_name} {self.first_name}"
+        return f"{self.id} - {self.last_name} {self.first_name}"

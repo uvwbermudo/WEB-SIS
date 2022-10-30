@@ -1,4 +1,5 @@
-from unicodedata import category
+
+from sqlalchemy import exc
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from flask_login import current_user, login_user, login_required, logout_user
 from flaskr import db
@@ -6,7 +7,19 @@ from .forms import AddCourse
 from flaskr.colleges.models import Colleges
 from .models import Courses
 
+
 courses_view = Blueprint('courses_view', __name__)
+
+
+def searchbar_query(filter, search_query):
+    if filter == 'course_code':
+        return Courses.query.filter(Courses.course_code.contains(search_query)).all()
+    elif filter == 'course_name':
+        return Courses.query.filter(Courses.course_name.contains(search_query)).all()
+    else:
+        return Courses.query.filter(Courses.course_code.contains(search_query)|
+        Courses.course_name.contains(search_query)).all()
+
 
 
 @courses_view.route('/courses')
@@ -19,15 +32,16 @@ def courses():
     session['college_choices'] = colleges
 
     courses = Courses.query.all()
+    for course in courses:
+        print(course.college)
+
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
 
     if 'from_search' in session and session['from_search'] == True:
         session['from_search'] = False
-        search_filter = str(session['search_query'])
-        courses = Courses.query.filter(
-            Courses.course_name.contains(search_filter) | 
-            Courses.course_code.contains(search_filter)).all()
+        courses = searchbar_query(session['search_filter'], session['search_query'])
+            
     return render_template('courses/courses.html', form=form, courses=courses)
 
 @courses_view.route('/course-add', methods=['GET','POST'])
@@ -46,8 +60,12 @@ def course_add():
             else:
                 new_course = Courses(course_name=course_name,course_code=course_code, college_code=college)
                 db.session.add(new_course)
-                db.session.commit()
-                flash(f'Successfully added "{new_course.course_code} - {new_course.course_name}"')
+                try:
+                    db.session.commit()
+                except exc.IntegrityError:
+                    flash(f'Error - Course name "{course_name}" is already in use', category='error')
+                else:
+                    flash(f'Successfully added "{new_course.course_code} - {new_course.course_name}"')
         else:
             for fieldName, errorMessages in form.errors.items():
                 for err in errorMessages:
@@ -75,7 +93,13 @@ def course_edit():
                 target.course_code = new_code
                 target.course_name = new_name
                 target.college_code = new_college
-                db.session.commit()
+                try:
+                    db.session.commit()
+                except exc.IntegrityError:
+                    flash(f'Error - Course name "{new_name}" is already in use.', category='error')
+                else:
+                    flash(f'Successfully updated "{target}"')
+
         else:
             for fieldName, errorMessages in form.errors.items():
                 for err in errorMessages:
@@ -98,5 +122,6 @@ def course_delete():
 def course_search():
     session['from_search'] = True
     session['search_query'] = request.form.get('searchbar')
+    session['search_filter'] = request.form.get('searchfield')
     return redirect(url_for('courses_view.courses'))
 
