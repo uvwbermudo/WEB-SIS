@@ -10,14 +10,20 @@ student_view = Blueprint('student_view', __name__)
 
 def searchbar_query(filter, search_query):  
     if filter == 'id':
-        return Students.query.filter(Students.id.contains(search_query)).all()
+        return Students.query.filter(
+            Students.id.contains(search_query)
+            ).all()
     elif filter == 'name':
-        return Students.query.filter(Students.last_name.contains(search_query) |
-        Students.first_name.contains(search_query)).all()
+        return Students.query.filter(
+            Students.last_name.contains(search_query) |
+            Students.first_name.contains(search_query)
+            ).all()
     else:
-        return Students.query.filter(Students.id.contains(search_query)|
-        Students.last_name.contains(search_query)|
-        Students.first_name.contains(search_query)).all()
+        return Students.query.filter(
+            Students.id.contains(search_query)|
+            Students.last_name.contains(search_query)|
+            Students.first_name.contains(search_query)
+            ).all()
 
         
 
@@ -33,12 +39,13 @@ def students():
 
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
-    
+
     if 'from_search' in session and session['from_search'] == True:
         session['from_search'] = False
-        students = searchbar_query(session['search_filter'],session['search_query'])
-
-    
+        students = searchbar_query(
+            filter=session['search_filter'],
+            search_query=session['search_query'],
+        )
     return render_template('student/students.html', form=form, students=students)
 
 @student_view.route('/student-add', methods=['POST','GET'])
@@ -59,7 +66,13 @@ def student_add():
             if check:
                 flash(f'ERROR: Course code "{id_number}" already in use', category='error')
             else:
-                new_student = Students(last_name=last_name,first_name=first_name, id=id_number, year=year, gender=gender, course_code=course)
+                new_student = Students(
+                    last_name=last_name,
+                    first_name=first_name, 
+                    id=id_number, year=year, 
+                    gender=gender, 
+                    course_code=course,
+                    )
                 db.session.add(new_student)
                 db.session.commit()
                 flash(f'Successfully added "{id_number} - {"".join((last_name,first_name))}"')

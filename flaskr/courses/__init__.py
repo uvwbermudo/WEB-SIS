@@ -13,12 +13,18 @@ courses_view = Blueprint('courses_view', __name__)
 
 def searchbar_query(filter, search_query):
     if filter == 'course_code':
-        return Courses.query.filter(Courses.course_code.contains(search_query)).all()
+        return Courses.query.filter(
+            Courses.course_code.contains(search_query)
+            ).all()
     elif filter == 'course_name':
-        return Courses.query.filter(Courses.course_name.contains(search_query)).all()
+        return Courses.query.filter(
+            Courses.course_name.contains(search_query)
+            ).all() 
     else:
-        return Courses.query.filter(Courses.course_code.contains(search_query)|
-        Courses.course_name.contains(search_query)).all()
+        return Courses.query.filter(
+            Courses.course_code.contains(search_query)|
+            Courses.course_name.contains(search_query)
+            ).all()
 
 
 
@@ -30,17 +36,17 @@ def courses():
     colleges = [(college.college_code,college.college_name) for college in colleges]
     form.college.choices = colleges
     session['college_choices'] = colleges
-
     courses = Courses.query.all()
-    for course in courses:
-        print(course.college)
 
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
 
-    if 'from_search' in session and session['from_search'] == True:
+    if 'from_search' in session and session['from_search']==True:
         session['from_search'] = False
-        courses = searchbar_query(session['search_filter'], session['search_query'])
+        courses = searchbar_query(
+            filter=session['search_filter'], 
+            search_query=session['search_query'],
+            )
             
     return render_template('courses/courses.html', form=form, courses=courses)
 
@@ -58,7 +64,11 @@ def course_add():
             if check:
                 flash(f'ERROR: Course code "{course_code}" already in use', category='error')
             else:
-                new_course = Courses(course_name=course_name,course_code=course_code, college_code=college)
+                new_course = Courses(
+                    course_name=course_name,
+                    course_code=course_code, 
+                    college_code=college,
+                    )
                 db.session.add(new_course)
                 try:
                     db.session.commit()
@@ -83,6 +93,7 @@ def course_edit():
             course_code = request.form.get('hid')
             new_code = request.form.get('course_code')
             check = Courses.query.get(new_code)
+
             if check and check.course_code != course_code:
                 flash (f'ERROR: Course Code "{new_code}" already in Use', category='error')
             else:
@@ -98,13 +109,13 @@ def course_edit():
                 except exc.IntegrityError:
                     flash(f'Error - Course name "{new_name}" is already in use.', category='error')
                 else:
-                    flash(f'Successfully updated "{target}"')
-
+                    flash(f'Successfully updated "{target}"')    
         else:
             for fieldName, errorMessages in form.errors.items():
                 for err in errorMessages:
                     flash(f'{err}', category='error')
-        return redirect(url_for('courses_view.courses'))
+    return redirect(url_for('courses_view.courses'))
+                    
 
 @courses_view.route('/course-delete', methods=['POST'])
 @login_required

@@ -8,7 +8,11 @@ class Students(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     year = db.Column(db.Integer(), nullable=False)
     gender = db.Column(db.String(6), nullable=False)
-    course_code = db.Column(db.String(20), db.ForeignKey('courses.course_code', ondelete="SET DEFAULT"), nullable=True, server_default="TEST DEFAULT")
+    course_code = db.Column(
+        db.String(20),
+        db.ForeignKey('courses.course_code', onupdate="CASCADE"), 
+        nullable=True,
+        )
 
     course = db.relationship('Courses', back_populates="students")
 

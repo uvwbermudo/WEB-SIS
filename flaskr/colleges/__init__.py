@@ -6,18 +6,24 @@ from .forms import AddCollege
 from .models import Colleges
 
 
-
 colleges_view = Blueprint('colleges_view', __name__)
 
 
 def searchbar_query(filter, search_query):
     if filter == 'college_code':
-        return Colleges.query.filter(Colleges.college_code.contains(search_query)).all()
+        return Colleges.query.filter(
+            Colleges.college_code.contains(search_query)
+            ).all()
     elif filter == 'college_name':
-        return Colleges.query.filter(Colleges.college_name.contains(search_query)).all()
+        return Colleges.query.filter(
+            Colleges.college_name.contains(search_query)
+            ).all()
     else:
-        return Colleges.query.filter(Colleges.college_code.contains(search_query)|
-        Colleges.college_name.contains(search_query)).all()
+        return Colleges.query.filter(
+            Colleges.college_code.contains(search_query)|
+            Colleges.college_name.contains(search_query)
+            ).all()
+
 
 @colleges_view.route('/colleges', methods=['POST','GET'])
 @login_required
@@ -26,25 +32,23 @@ def college_view():
         return redirect(url_for('auth.login'))
     form = AddCollege(request.form)
     colleges = Colleges.query.all()
-
-    for college in colleges:
-        for i,course in enumerate(college.courses):
-            print(i, course)
-    
-    if 'from_search' in session and session['from_search'] == True:
+   
+    if 'from_search' in session and session['from_search']==True:
         session['from_search'] = False
-        colleges = searchbar_query(session['search_filter'], session['search_query'])
+        colleges = searchbar_query(
+            filter=session['search_filter'], 
+            search_query=session['search_query'],
+            )
 
     return render_template('colleges/colleges.html', form=form, colleges=colleges)
+
 
 @colleges_view.route('/college-add', methods=['POST'])
 @login_required
 def college_add():
     form = AddCollege(request.form)
     if request.method == 'POST':
-
         if form.validate_on_submit():
-
             college_name = request.form.get('college_name')
             college_code = request.form.get('college_code')
             check = Colleges.query.get(college_code)
@@ -53,16 +57,17 @@ def college_add():
                 flash(f'ERROR: College code "{college_code}" already in use', category='error')
                 print(check)
             else:
-                new_college = Colleges(college_name=college_name,college_code=college_code)
+                new_college = Colleges(
+                    college_name=college_name,
+                    college_code=college_code,
+                    )
                 db.session.add(new_college)
-            
                 try: 
                     db.session.commit()
                 except exc.IntegrityError:
                     flash(f'ERROR - College name "{college_name}" is already in use. ', category='error')
                 else:
                     flash(f'Successfully added "{new_college.college_code} - {new_college.college_name}"')
-
         else:
             for fieldName, errorMessages in form.errors.items():
                 for err in errorMessages:
@@ -70,38 +75,39 @@ def college_add():
         
     return redirect(url_for('colleges_view.college_view'))
 
+
 @colleges_view.route('/college-edit', methods=['POST'])
 @login_required
 def college_edit():
     form = AddCollege(request.form)
-
     if request.method == 'POST':
-
         if form.validate_on_submit():
             new_code = request.form.get('college_code')
+            new_name = request.form.get('college_name')
             college_code = request.form.get('hid')
             check = Colleges.query.get(new_code)
+
             if check and check.college_code != college_code:
                 flash(f'ERROR: College code "{new_code}" already in use', category='error')
             else:
-                new_name = request.form.get('college_name')
-                
                 target = Colleges.query.filter(Colleges.college_code==college_code).first()
                 target.college_code = new_code
                 target.college_name = new_name
-
+                
                 try: 
                     db.session.commit()
-                except exc.IntegrityError:
+                except exc.IntegrityError as e:
+                    print(e)
                     flash(f'ERROR - College name "{new_name}" is already in use. ', category='error')
                 else:
                     flash(f'Successfully updated "{target}"')
-
-            return redirect(url_for('colleges_view.college_view'))
         else:
             for fieldName, errorMessages in form.errors.items():
                 for err in errorMessages:
                     flash(f'{err}', category='error')
+
+    return redirect(url_for('colleges_view.college_view'))
+
 
 @colleges_view.route('/college-delete', methods=['POST','GET'])
 @login_required
@@ -113,6 +119,7 @@ def college_delete():
         db.session.commit()
         flash(f'Deleted "{target.college_name}" successfully', category='success')
     return redirect(url_for('colleges_view.college_view'))
+
 
 @colleges_view.route('/college-search', methods=['POST','GET'])
 @login_required
