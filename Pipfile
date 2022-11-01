@@ -15,6 +15,7 @@ sqlalchemy-utils = "*"
 python-dotenv = "*"
 flask-wtf = "*"
 wtforms = {extras = ["email"], version = "*"}
+wtforms-json = "*"
 
 [dev-packages]
 

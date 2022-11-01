@@ -39,7 +39,13 @@ class RegisterForm(FlaskForm):
             EqualTo('password2', message='Passwords must match')
             ]
         )
-    password2 = PasswordField('Confirm Password', [validators.DataRequired()])
+    password2 = PasswordField(
+        'Confirm Password', 
+        validators=[
+            validators.DataRequired(),
+            EqualTo('password', message='Passwords must match')
+            ]
+        )
     submit = SubmitField("Register")
 
 

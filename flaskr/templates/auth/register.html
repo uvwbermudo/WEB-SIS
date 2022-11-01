@@ -10,43 +10,29 @@
             <br/>
                 <h5 class="text-muted">Create an account</h5>
         </div>
+        {% block form %}
         <form method="POST">
-            {{ form.csrf_token }}
             {{ form.email.label(class="form-label")}}
             {{ form.email(class="form-control form-email")}}
-            {% for error in form.email.errors %}
-                <span class="msu-text">{{error}}</span>
-                <style>
-                    .form-email {border-color: red;}
-                </style>
-            {% endfor %}
+            <span></span>
             <br/>
 
             {{ form.password.label(class="form-label")}}
             {{ form.password(class="form-control form-password")}}
-            {% for error in form.password.errors %}
-                <span class="msu-text">{{error}}</span>
-                <style>
-                    .form-password {border-color: red;}
-                </style>
-            {% endfor %}
+            <span></span>
             <br/>
             {{ form.password2.label(class="form-label")}}
             {{ form.password2(class="form-control form-password2")}}
-            {% for error in form.password2.errors %}
-                <span class="msu-text">{{error}}</span>
-                <style>
-                    .form-password2 {border-color: red;}
-                </style>
-            {% endfor %}
+            <span></span>
             <br/>
             <div class="container p-0">
-            {{ form.submit(class="btn msuify-button") }}
+            {% set url,dest = url_for('auth.register_user'), url_for('auth.login')%}
+            <button class="btn msuify-button" onclick="verify_info('{{ csrf_token() }}','{{url}}','{{dest}}')" type="button">Register</button>
             <a href="/login" class="link p-2 msu-text-link">Already have an account?</a>
             </div>
 
         </form>
-
+        {% endblock %}
     </div>
 </div>
 {% endblock %}  
