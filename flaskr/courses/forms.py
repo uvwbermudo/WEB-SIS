@@ -31,7 +31,6 @@ class AddCourse(FlaskForm):
             ],
         )
     college = SelectField('College Origin', [validators.DataRequired()])
-    submit = SubmitField("Submit")
 
 
 

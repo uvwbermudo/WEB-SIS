@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, session
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session, Response
 from flask_login import current_user, login_user, login_required, logout_user
 from flaskr import db
 from .models import Students
 from .forms import AddStudent
 from flaskr.courses.models import Courses
+import json
+import wtforms_json
 
 student_view = Blueprint('student_view', __name__)
 
@@ -135,7 +137,16 @@ def student_delete():
 @login_required
 def student_search():
     if request.method == 'POST':
-        session['from_search'] = True
-        session['search_query'] = request.form.get('searchbar')
-        session['search_filter'] = request.form.get('searchfield')
-        return redirect(url_for('student_view.students'))
+        search = request.json['search_bar']
+        filter = request.json['search_filter']
+        print(search, filter)
+        result = searchbar_query(filter=filter, search_query=search)
+        result = col_to_list(result)
+        return Response(json.dumps([result]), status=499, mimetype='application/json')
+
+def col_to_list(list):
+    temp = {}
+    for course in list:
+        temp[course.course_code]=course.course_name
+    print(temp)
+    return temp

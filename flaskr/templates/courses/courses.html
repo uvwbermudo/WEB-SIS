@@ -27,26 +27,23 @@ text-light
               <div class="col-lg-2 p-1">
                 <a href="/courses" class="btn btn-secondary w-100"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
               </div>
-              <div class="col col-lg-1">
+              <div class="col col-lg-2">
               </div>
-              <div class="col-lg-5 p-1">
+              <div class="col-lg-6 p-1">
                 <div class="row">
-                  <div class="col-3 p-0">
-                    <select name="searchfield" id="" class="form-select">
+                  <div class="col-4 p-0">
+                    <select name="course_filter" id="course_filter" class="form-select">
                       <option selected> Filter by</option>
                       <option value="course_code">Course Code</option>
                       <option value="course_name">Name</option>
                     </select>
                   </div>
-                  <div class="col-9 p-0 px-1 pe-2">
-                    <input class="form-control shadow-sm" type="search" placeholder="Search a Course" aria-label="Search" name="searchbar">
+                  <div class="col-8 p-0 px-1 pe-2">
+                    <input class="form-control shadow-sm" type="search" placeholder="Search a Course" aria-label="Search" name="course_searchbar" id="course_searchbar">
                   </div>
               </div>
               </div>
               
-              <div class="col-lg-2 p-1">
-                <button class="btn btn-success shadow-sm btn-md w-100" type="submit"> Search</button>
-              </div>
               
             </div> 
         </form>
@@ -63,12 +60,13 @@ text-light
           </div>
           <form action="/course-add" method="POST">
           <div class="modal-body">
-              {{ form.csrf_token }}
               {{ form.course_code.label(class="form-label") }}
               {{ form.course_code(class="form-control") }}  
+              <span></span>
               <br/>
               {{ form.course_name.label(class="form-label") }}
               {{ form.course_name(class="form-control") }} 
+              <span></span>
               <br/>
               {{ form.college.label(class="form-label") }}
               {% if form.college.choices|length > 0 %}
@@ -81,7 +79,7 @@ text-light
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             {% if form.college.choices|length > 0 %}
-            {{ form.submit(class="btn msuify-button")}}
+            <button class="btn msuify-button" onclick="verify_course(0)" type="button">Submit</button>
             {% endif %}
           </div>
           </form>
@@ -96,10 +94,10 @@ text-light
 {% else %}
 
 <!-- Table -->
-<div class="container mt-3 bg-white rounded-5 py-2 shadow-sm">
+<div class="container mt-3 bg-white rounded-1 py-2 shadow-sm" id="course_tc">
   <div class="table-responsive-md overflow-x-scroll">
     <table class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 720px;">
-      <thead>
+      <thead id="course_thead">
   
         <tr>
           <th scope="col-2" class="py-3 ps-5">Course Code</th>
@@ -109,7 +107,7 @@ text-light
         </tr>
       
       </thead>
-      <tbody class="table-group-divider">
+      <tbody class="table-group-divider" id="course_tbody">
       {% for course in courses %}
       <tr>
           <th scope="row" class="ps-5">{{ course.course_code }}</th>
@@ -146,9 +144,11 @@ text-light
                       {{ form.course_code.label(class="form-label") }}
                       {% set course_code, course_name, college = course.course_code, course.course_name, course.college_code %}
                       {{ form.course_code(class="form-control", value=course_code) }}
+                      <span></span>
                       <br/>
                       {{ form.course_name.label(class="form-label") }}
                       {{ form.course_name(class="form-control", value=course_name) }} 
+                      <span></span>
                       <br/>
                       {{ form.college.label(class="form-label")}}
                       {% if form.college.choices|length > 0 %}
@@ -182,9 +182,9 @@ text-light
                 Submit Changes?
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary"  data-bs-target="#editcourse{{course.course_code}}" data-bs-toggle="modal">Back</button>
+                <button type="button" class="btn btn-secondary"  data-bs-target="#editcourse{{course.course_code}}" data-bs-toggle="modal" id="back">Back</button>
                 {% if form.college.choices|length > 0 %}
-                {{ form.submit(class="btn msuify-button")}}
+                <button class="btn msuify-button" onclick="verify_course(1, '{{course.course_code}}')" type="button">Submit</button>
                 {% endif %}
               </div>
             </div>
@@ -245,7 +245,7 @@ text-light
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          {{ form.submit(class="btn msuify-button")}}
+          {# {{ form.submit(class="btn msuify-button")}} #}
         </div>
         </form>
       </div>

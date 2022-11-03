@@ -59,7 +59,8 @@
     
 <body class="body-darkwhite before-space body-img2">
     <!-- NAVBAR 2 -->
-    <div class="container px-1 py-1 mt-5 bg-white w-75 rounded-3 pill shadow-sm">
+    <input class="p-0 m-0" type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}">
+    <div class="container px-1 py-1 mt-5 bg-white w-75 pill shadow-sm">
         <ul class="nav nav-pills nav-fill">
 
             <li class="nav-item {% block studentpill %}{% endblock %}">
@@ -76,6 +77,9 @@
           </ul>
     </div>
     {% block body %}{% endblock %}
+    <script src="https://code.jquery.com/jquery-3.6.1.js"
+    integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
+    crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
     <script type="text/javascript">
         var csrf_token = "{{ csrf_token() }}";
@@ -87,7 +91,10 @@
                 }
             }
         });
+
     </script>
+    {# testing enevt listeners #}
     <script type="text/javascript" src="../../static/js/main.js"></script>
+
 </body>
 </html>

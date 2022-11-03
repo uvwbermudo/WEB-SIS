@@ -31,29 +31,28 @@ text-light
             </div>
             <div class="col col-lg-1">
             </div>
-            <div class="col-lg-5 p-1">
+
+            <div class="col-lg-1 p-1">
+            </div>
+            <div class="col-lg-6 p-1">
               <div class="row">
-                <div class="col-3 p-0">
-                  <select name="searchfield" id="" class="form-select">
-                    <option selected> Filter by</option>
+                <div class="col-4 p-0">
+                  <select name="searchfield" id="college_filter" name="searchfilter" class="form-select">
+                    <option value="" selected> Filter by</option>
                     <option value="college_code">College Code</option>
                     <option value="college_name">Name</option>
                   </select>
                 </div>
         
-
-                <div class="col-9 p-0 px-1 pe-2">
-                  <input class="form-control shadow-sm" type="search" placeholder="Search a College" aria-label="Search" name="searchbar">
+                
+                <div class="col-8 p-0 px-1 pe-2">
+                  <input class="form-control shadow-sm" type="search" placeholder="Search a College" aria-label="Search" id="college_searchbar" name="searchbar">
                 </div>
               </div>
             </div>
             
-            <div class="col-lg-2 p-1">
-              <button class="btn btn-success shadow-sm btn-md w-100" type="submit"> Search</button>
-            </div>
+ 
             
-            
-          
           </div> 
       </form>
   </div>
@@ -69,16 +68,18 @@ text-light
               </div>
               <form action="/college-add" method="POST">
               <div class="modal-body">
-                  {{ form.csrf_token }}
                   {{ form.college_code.label(class="form-label") }}
                   {{ form.college_code(class="form-control") }} 
+                  <span></span>
                   <br/>
                   {{ form.college_name.label(class="form-label") }}
                   {{ form.college_name(class="form-control") }} 
+                  <span></span>
+                  <br/>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                {{ form.submit(class="btn msuify-button")}}
+                <button class="btn msuify-button" onclick="verify_college('{{ csrf_token() }}',0)" type="button">Submit</button>
               </div>
               </form>
             </div>
@@ -87,14 +88,14 @@ text-light
 
   {% if colleges == None or colleges|length == 0 %}
   <div class="container d-flex justify-content-center pt-5">
-    <h1 class="text-muted display-5">No results</h1>
+    <h1 class="text-muted display-5">No Colleges at the moment</h1>
   </div>
   {% else %}
 
-  <div class="container mt-3 bg-white rounded-5 py-2 shadow-sm">
+  <div id="college_tc" class="container mt-3 bg-white rounded-2 py-2 shadow-sm">
     <div class="table-responsive-md overflow-x-scroll">
-      <table class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 720px;">
-        <thead>
+      <table id="college_table" class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 700px;">
+        <thead id="college_thead">
     
           <tr>
             <th scope="col-2" class="py-3 ps-5">College Code</th>
@@ -103,21 +104,20 @@ text-light
           </tr>
         
         </thead>
-        <tbody class="table-group-divider">
+        <tbody id="college_tbody" class="table-group-divider">
         {% for college in colleges %}
-        <tr>
+        <tr id="college_row">
             <th scope="row" class="ps-5">{{ college.college_code }}</th>
             <td>{{ college.college_name }}</td>
             <td class="pe-0">
-                <a href="/college-edit/{{college.college_code}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcollege{{college.college_code}}" style="width: 120px;">Edit</a>
+                <a href="/college-verify/{{college.college_code}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcollege{{college.college_code}}" style="width: 120px;">Edit</a>
 
-                <a href="/college-delete/{{college.college_code}}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 120px;" data-bs-target="#confirmdelete{{college.college_code}}" data-bs-toggle="modal">Delete</a>
+                <button class="btn btn-danger btn-sm my-1" type="button" aria-pressed="true" style="width: 120px;" data-bs-target="#confirmdelete{{college.college_code}}" data-bs-toggle="modal">Delete</button>
 
             </td>
         </tr>
-
         <!-- EDIT MODAL -->
-        <form action="/college-edit" method="POST">
+        <form id='editing' action="/college-edit" method="POST">
           <div id="editcollege{{college.college_code}}" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered">
                   <div class="modal-content">
@@ -127,15 +127,16 @@ text-light
                     </div>
                     
                     <div class="modal-body">
-                        {{ form.csrf_token }}
-                        <input type="hidden" value="{{ college.college_code }}" id="hid" name="hid" style="padding: 0;">
                         
                         {{ form.college_code.label(class="form-label") }}
                         {% set college_code, college_name = college.college_code, college.college_name%}
-                        {{ form.college_code(class="form-control", value=college_code) }}
+                        {{ form.college_code(class="form-control college_code edit", value=college_code) }}
+                        <span></span>
                         <br/>
                         {{ form.college_name.label(class="form-label") }}
-                        {{ form.college_name(class="form-control", value=college_name) }} 
+                        {{ form.college_name(class="form-control college_name edit", value=college_name) }} 
+                        <span></span>
+                        <br/>
                     </div>
                     
                     <div class="modal-footer">
@@ -160,8 +161,8 @@ text-light
                   Submit Changes?
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-target="#editcollege{{college.college_code}}" data-bs-toggle="modal">Back</button>
-                  {{ form.submit(class="btn msuify-button")}}
+                  <button id="back" type="button" class="btn btn-secondary" data-bs-target="#editcollege{{college.college_code}}" data-bs-toggle="modal">Back</button>
+                  <button class="btn msuify-button" onclick="verify_college('{{ csrf_token() }}',1, '{{ college.college_code }}')" type="button">Submit</button>
                 </div>
               </div>
             </div>
@@ -195,7 +196,7 @@ text-light
       </form>
         {% endfor %}
           
-        </tbody>
+
       </table>
     </div>
   </div>
@@ -203,31 +204,6 @@ text-light
 
 
 
-
-<div class="modal fade" id="addcollege" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Add a College</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form action="/college-add" method="POST">
-          <div class="modal-body">
-              {{ form.csrf_token }}
-              {{ form.college_code.label(class="form-label") }}
-              {{ form.college_code(class="form-control") }}
-              <br/>
-              {{ form.college_name.label(class="form-label") }}
-              {{ form.college_name(class="form-control") }} 
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            {{ form.submit(class="btn msuify-button")}}
-          </div>
-          </form>
-        </div>
-      </div>
-</div>
 
 {% endif %}
 

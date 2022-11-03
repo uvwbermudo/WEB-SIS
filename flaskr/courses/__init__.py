@@ -1,31 +1,17 @@
 
 from sqlalchemy import exc
-from flask import Blueprint, render_template, request, flash, redirect, url_for, session
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session, Response
 from flask_login import current_user, login_user, login_required, logout_user
 from flaskr import db
 from .forms import AddCourse
 from flaskr.colleges.models import Colleges
+from flaskr import get_error_items, get_form_fields
 from .models import Courses
+import json
+import wtforms_json
 
 
 courses_view = Blueprint('courses_view', __name__)
-
-
-def searchbar_query(filter, search_query):
-    if filter == 'course_code':
-        return Courses.query.filter(
-            Courses.course_code.contains(search_query)
-            ).all()
-    elif filter == 'course_name':
-        return Courses.query.filter(
-            Courses.course_name.contains(search_query)
-            ).all() 
-    else:
-        return Courses.query.filter(
-            Courses.course_code.contains(search_query)|
-            Courses.course_name.contains(search_query)
-            ).all()
-
 
 
 @courses_view.route('/courses')
@@ -50,72 +36,75 @@ def courses():
             
     return render_template('courses/courses.html', form=form, courses=courses)
 
-@courses_view.route('/course-add', methods=['GET','POST'])
+@courses_view.route('/course-verify', methods=['GET','POST'])
 @login_required
-def course_add():
-    form = AddCourse(request.form)
+def course_verify():
+    temp_json = request.get_json()
+    form = AddCourse.from_json(temp_json)
     form.college.choices = session['college_choices']
+    fields = get_form_fields(form)
     if request.method == 'POST':
+        course_name = request.json['course_name']
+        course_code = request.json['course_code']
+        college = request.json['college']
+        old_code = request.json['hid']
+        check = Courses.query.get(course_code)
+        check_name = Courses.query.filter(Courses.course_name==course_name).first()
+        mode = request.json['mode']
         if form.validate_on_submit():
-            course_name = request.form.get('course_name')
-            course_code = request.form.get('course_code')
-            college = request.form.get('college')
-            check = Courses.query.get(course_code)
+            if mode == 1:               # mode = 1 is for editing
+                errors = get_error_items(form)
+                if check and check.course_code != old_code:
+                    errors['course_code']= ['Course Code is already being used.']
+                    if check_name and check_name.course_code != old_code:
+                        errors['course_name']= ['Course name is already being used.']
+                    return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
+            
+                else:
+                    target = Courses.query.get(old_code)
+                    target.course_code = course_code
+                    target.course_name = course_name
+                    try: 
+                        db.session.commit()
+                    except exc.IntegrityError as e:
+                        print(e)
+                        errors['course_name']= ['Course name is already being used.']
+                        return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
+                    else:
+                        flash(f'Successfully updated "{target}"')
+                    return Response(status=299)
+
             if check:
-                flash(f'ERROR: Course code "{course_code}" already in use', category='error')
+                errors = get_error_items(form)
+                errors['course_code'] = ['Course code is already being used.']
+                if check_name:
+                    errors['course_name']= ['Course name is already being used.']
+                return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
             else:
                 new_course = Courses(
                     course_name=course_name,
                     course_code=course_code, 
                     college_code=college,
-                    )
+                    )   
                 db.session.add(new_course)
                 try:
                     db.session.commit()
                 except exc.IntegrityError:
-                    flash(f'Error - Course name "{course_name}" is already in use', category='error')
+                    errors = get_error_items(form)
+                    errors['course_name']= ['Course name is already being used.']
+                    return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
                 else:
                     flash(f'Successfully added "{new_course.course_code} - {new_course.course_name}"')
+                    return Response(status=299)
+
         else:
-            for fieldName, errorMessages in form.errors.items():
-                for err in errorMessages:
-                    flash(f'{err}', category='error')
-        
-    return redirect(url_for('courses_view.courses'))
-
-@courses_view.route('/course-edit', methods=['GET','POST'])
-@login_required
-def course_edit():
-    form = AddCourse(request.form)
-    form.college.choices = session['college_choices']
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            course_code = request.form.get('hid')
-            new_code = request.form.get('course_code')
-            check = Courses.query.get(new_code)
-
-            if check and check.course_code != course_code:
-                flash (f'ERROR: Course Code "{new_code}" already in Use', category='error')
-            else:
-                new_name = request.form.get('course_name')
-                new_college = request.form.get('college')
-
-                target = Courses.query.get(course_code)
-                target.course_code = new_code
-                target.course_name = new_name
-                target.college_code = new_college
-                try:
-                    db.session.commit()
-                except exc.IntegrityError:
-                    flash(f'Error - Course name "{new_name}" is already in use.', category='error')
-                else:
-                    flash(f'Successfully updated "{target}"')    
-        else:
-            for fieldName, errorMessages in form.errors.items():
-                for err in errorMessages:
-                    flash(f'{err}', category='error')
-    return redirect(url_for('courses_view.courses'))
-                    
+            errors = get_error_items(form)
+            if check:
+                errors['course_code']= ['College Code is already being used.']
+            if check_name:
+                errors['course_name']= ['College name is already being used.']
+            return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
+    
 
 @courses_view.route('/course-delete', methods=['POST'])
 @login_required
@@ -131,8 +120,37 @@ def course_delete():
 @courses_view.route('/course-search', methods=['POST'])
 @login_required
 def course_search():
-    session['from_search'] = True
-    session['search_query'] = request.form.get('searchbar')
-    session['search_filter'] = request.form.get('searchfield')
-    return redirect(url_for('courses_view.courses'))
+    if request.method == 'POST':
+        search = request.json['search_query']
+        filter = request.json['search_filter']
+        result = searchbar_query(filter=filter, search_query=search)
+        result = col_to_list(result)
+        print(result)
+        return Response(json.dumps([result]), status=298, mimetype='application/json')
 
+
+def col_to_list(list):
+    temp = []
+    for course in list:
+        if course.college:
+            college_name = course.college.college_name
+        else:
+            college_name = None
+        temp.append([course.course_code, course.course_name, college_name])
+    return temp
+
+
+def searchbar_query(filter, search_query):
+    if filter == 'course_code':
+        return Courses.query.filter(
+            Courses.course_code.contains(search_query)
+            ).all()
+    elif filter == 'course_name':
+        return Courses.query.filter(
+            Courses.course_name.contains(search_query)
+            ).all() 
+    else:
+        return Courses.query.filter(
+            Courses.course_code.contains(search_query)|
+            Courses.course_name.contains(search_query)
+            ).all()

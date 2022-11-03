@@ -55,3 +55,15 @@ def create_app():
 
 
     return app
+
+def get_error_items(form):
+    errors = {}
+    for fieldName, errorMessages in form.errors.items():
+        errors[fieldName] = errorMessages
+    return errors
+
+def get_form_fields(form):
+    fields = []
+    for keys in form.data.keys():
+        fields.append(keys)
+    return fields

@@ -1,12 +1,12 @@
 
 from unicodedata import category
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, Response
+from flask import Blueprint, render_template, request, flash, redirect, url_for, Response
 from flask_login import current_user, login_user, login_required, logout_user
 from . forms import RegisterForm, UserForm
 from . models import User
 from flaskr import db
+from flaskr import get_error_items, get_form_fields
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.datastructures import ImmutableMultiDict
 import json
 import wtforms_json
 
@@ -42,7 +42,7 @@ def login():
                 if check_password_hash(user.password, password):
                     login_user(user)
                     flash('Logged in successfully', category='success')
-                    return Response(status=200)
+                    return Response(status=299)
                 errors = get_error_items(form)
                 errors['password'] = ['Incorrect Password']
                 return Response(json.dumps([errors, fields]), status=499, mimetype='application/json')
@@ -80,7 +80,6 @@ def register_user():
                 errors = get_error_items(form)
                 errors['email']= ['Email is already taken.']
                 return Response(json.dumps([errors, fields]), status=499, mimetype='application/json')
-
             new_user = User(
                 email=email, 
                 password=generate_password_hash(password,method='sha256')
@@ -88,7 +87,7 @@ def register_user():
             db.session.add(new_user)
             db.session.commit()
             flash('Successfuly created an account! Please log in.', category='success')
-            return Response(status=200)
+            return Response(status=299)
         else:
             errors = get_error_items(form)
             if user:
@@ -109,14 +108,3 @@ def about():
     return render_template('auth/about.html')
 
 
-def get_error_items(form):
-    errors = {}
-    for fieldName, errorMessages in form.errors.items():
-        errors[fieldName] = errorMessages
-    return errors
-
-def get_form_fields(form):
-    fields = []
-    for keys in form.data.keys():
-        fields.append(keys)
-    return fields
