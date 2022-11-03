@@ -6,9 +6,58 @@ $('document').ready(function(){
     $('#college_filter').on('change', search_college)
     $('#course_searchbar').on('input',course_search)
     $('#course_filter').on('change',course_search)
+    $('#student_searchbar').on('input', student_search)
 })
 
+function student_search(){
+    var search_query = $('#student_searchbar').val()
+    var search_filter = $('#student_filter').val();
+    const student_thead = $('#student_thead');
+    const student_tbody = $('#student_tbody');  
+    const student_tc = $('#student_tc');
+    console.log(search_query)
+    fetch('/student-search', {
+        method: 'POST',
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrf,
+        },
+        body: JSON.stringify({ 
+            search_query: search_query,
+            search_filter: search_filter,
+            }),
+      }).then(response => (response.json()))
+      .then(function(response){
+          console.log(response)
+          student_tbody.html('')
+          for(var i=0; i<response[0].length; i++){
+            student_tbody.append(`
+            <tr>
+            <th scope="row" class="ps-5">${response[0][i][0]}</th>
+            <td>${response[0][i][1]}</td>
+            <td>${response[0][i][2]}</td>
+            <td id="student_course${response[0][i][0]}"></td>
+            <td>${response[0][i][4]}</td>
+            <td>${response[0][i][5]}</td>
+  
+            <td class="pe-0">
+                <a href="/student-edit/${response[0][i][0]}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editstudent${response[0][i][0]}" style="width: 120px;">Edit</a>
+  
+                <a href="/student-delete/${response[0][i][0]}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 120px;" data-bs-target="#confirmdelete${response[0][i][0]}" data-bs-toggle="modal">Delete</a>
+  
+            </td>
+            `)
+            if (!response[0][i][3]){
+            $("#student_course"+response[0][i][0]).html('<p class="fst-italic fw-light my-auto h-50"> Course Removed</p>')
+            } else {
+            $("#student_course"+response[0][i][0]).html(response[0][i][3])
+            }
 
+      }
+    })
+
+}
 
 
 function course_search(){
@@ -282,6 +331,90 @@ function verify_course(mode,hid=0) {
                     formfield = $('.modal-body #'+field);
                     if (mode == 1){
                         formfield = $('div#editcourse'+hid+' #'+field)
+                    }
+                    formfieldnext = formfield.next();
+                    formfield.css({"border-color":"green"});
+                    formfieldnext.html("<span class=\"ms-auto float-end text-success\">Looks Good! <i class=\"bi-check-circle-fill\"></i> </span>");
+                    formfieldnext.css({"color":"green"});
+                }
+            })
+        })
+}
+
+
+function verify_student(mode,hid=0) {
+    student_id = $('div#addstudent #id')
+    last_name = $('div#addstudent #last_name')
+    first_name = $('div#addstudent #first_name')
+    year = $('div#addstudent #year')
+    gender = $('div#addstudent #gender')
+    course = $('div#addstudent #course')
+    if (mode == 1){
+        student_id = $('div#editstudent'+hid+' #id')
+        last_name = $('div#editstudent'+hid+' #last_name')
+        first_name = $('div#editstudent'+hid+' #first_name')
+        year = $('div#editstudent'+hid+' #year')
+        gender = $('div#editstudent'+hid+' #gender')
+        course = $('div#editstudent'+hid+' #course')
+    }
+    console.log('FUCK ME')
+    console.log(student_id.val(),last_name.val(),first_name.val(),year.val(),gender.val(),course.val())
+
+    fetch('/student-verify', {
+        method: 'POST',     
+        credentials: "include",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrf
+          },
+        body: JSON.stringify({ 
+            id: student_id.val(),
+            last_name: last_name.val(),
+            first_name: first_name.val(),
+            year: year.val(),
+            gender: gender.val(),
+            course: course.val(),
+            hid: hid,
+            mode: mode,
+            }),
+        })
+        .then(response => {
+            if (response.status == 299){
+                console.log('Successfully Added Student') 
+                location.reload()
+                return
+            } else if( response.status == 497){
+                console.log('Verified connection')
+                return
+            } 
+            return response.json()
+        })  
+        .then(function(responses) {
+            responses[1].forEach(function(field){
+                console.log(responses)
+                console.log(responses[0])   
+                if (field == 'year' || field == 'gender' || field == 'course'){
+                    return
+                }
+                if (field in responses[0]) {
+                    
+                    formfield = $('#'+field);
+                    if (mode == 1){
+                        $('div#confirm'+hid+' #back').click(); 
+                        
+                        formfield = $('div#editstudent'+hid+' #'+field)
+                        console.log('div#editstudent'+hid+' #'+field)
+                        console.log(formfield)
+                    }
+                    formfieldnext = formfield.next();
+                    formfield.css({"border-color":"red"});
+                    formfieldnext.html('');
+                    formfieldnext.html(
+                        "<span class=\"ms-auto float-end text-danger\">"+responses[0][field][0]+" <i class=\"bi-exclamation-circle-fill\"></i> </span>");
+                } else {
+                    formfield = $('.modal-body #'+field);
+                    if (mode == 1){
+                        formfield = $('div#editstudent'+hid+' #'+field)
                     }
                     formfieldnext = formfield.next();
                     formfield.css({"border-color":"green"});

@@ -17,22 +17,14 @@ courses_view = Blueprint('courses_view', __name__)
 @courses_view.route('/courses')
 @login_required
 def courses():
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
     form = AddCourse(request.form)
     colleges = Colleges.query.all()
     colleges = [(college.college_code,college.college_name) for college in colleges]
     form.college.choices = colleges
     session['college_choices'] = colleges
     courses = Courses.query.all()
-
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
-
-    if 'from_search' in session and session['from_search']==True:
-        session['from_search'] = False
-        courses = searchbar_query(
-            filter=session['search_filter'], 
-            search_query=session['search_query'],
-            )
             
     return render_template('courses/courses.html', form=form, courses=courses)
 
@@ -100,9 +92,9 @@ def course_verify():
         else:
             errors = get_error_items(form)
             if check:
-                errors['course_code']= ['College Code is already being used.']
+                errors['course_code']= ['Course Code is already being used.']
             if check_name:
-                errors['course_name']= ['College name is already being used.']
+                errors['course_name']= ['Course name is already being used.']
             return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
     
 
@@ -125,7 +117,6 @@ def course_search():
         filter = request.json['search_filter']
         result = searchbar_query(filter=filter, search_query=search)
         result = col_to_list(result)
-        print(result)
         return Response(json.dumps([result]), status=298, mimetype='application/json')
 
 

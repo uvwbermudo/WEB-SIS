@@ -31,14 +31,14 @@ text-light
             <div class="container col-lg-5 p-1">
               <div class="row">
                   <div class="col-3 p-0">
-                    <select name="searchfield" id="" class="form-select">
+                    <select name="searchfield" id="student_filter" class="form-select">
                       <option selected> Filter by</option>
                       <option value="id">ID</option>
                       <option value="name">Name</option>
                     </select>
                   </div>
                   <div class="col-9 p-0 px-1 pe-2">
-                    <input class="form-control shadow-sm" type="search" placeholder="Search a student" aria-label="Search" name="searchbar">
+                    <input class="form-control shadow-sm" type="search" placeholder="Search a student" aria-label="Search" name="searchbar" id="student_searchbar">
                   </div>
               </div>
             </div>
@@ -63,15 +63,17 @@ text-light
           </div>
           
           <div class="modal-body">
-              {{ form.csrf_token }}
               {{ form.id.label(class="form-label") }}
               {{ form.id(class="form-control") }}  
+              <span></span>
               <br/>
               {{ form.last_name.label(class="form-label") }}
               {{ form.last_name(class="form-control") }} 
+              <span></span>
               <br/>
               {{ form.first_name.label(class="form-label") }}
               {{ form.first_name(class="form-control") }}
+              <span></span>
               <br/>
               {{ form.year.label(class="form-label") }}
               {{ form.year(class="form-select") }}
@@ -89,7 +91,7 @@ text-light
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             {% if form.course.choices|length > 0 %}
-            {{ form.submit(class="btn msuify-button")}}
+            <button class="btn msuify-button" onclick="verify_student(0)" type="button">Submit</button>
             {% endif %}
           </div>
           
@@ -106,10 +108,10 @@ text-light
 {% else %}
 
 <!-- Table -->
-<div class="container mt-3 bg-white rounded-5 py-2 shadow-sm">
-  <div class="table-responsive-md overflow-x-scroll">
+<div class="container mt-3 bg-white rounded-1 py-2 shadow-sm">
+  <div class="table-responsive-md overflow-x-scroll" id="student_tc">
     <table class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 720px;">
-      <thead>
+      <thead id="student_thead">
   
         <tr>
           <th scope="col-2" class="py-3 ps-5">ID Number</th>
@@ -123,7 +125,7 @@ text-light
         </tr>
       
       </thead>
-      <tbody class="table-group-divider">
+      <tbody class="table-group-divider" id="student_tbody">
       {% for student in students %}
       <tr>
           <th scope="row" class="ps-5">{{ student.id }}</th>
@@ -160,15 +162,17 @@ text-light
                       
                       {% set id, last_name, first_name, year, gender, course = student.id,student.last_name, student.first_name, student.year, student.gender, student.course_code %}
 
-                      {{ form.csrf_token }}
                       {{ form.id.label(class="form-label") }}
                       {{ form.id(class="form-control", value=id) }}  
+                      <span></span>
                       <br/>
                       {{ form.last_name.label(class="form-label") }}
                       {{ form.last_name(class="form-control", value=last_name) }} 
+                      <span></span>
                       <br/>
                       {{ form.first_name.label(class="form-label") }}
                       {{ form.first_name(class="form-control", value=first_name) }}
+                      <span></span>
                       <br/>
                       {{ form.year.label(class="form-label") }}
                       {{ form.year(class="form-select", value=year) }}
@@ -208,9 +212,9 @@ text-light
                 Submit Changes?
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary"  data-bs-target="#editcourse{{course.course_code}}" data-bs-toggle="modal">Back</button>
+                <button type="button" class="btn btn-secondary"  data-bs-target="#editstudent{{student.id}}" data-bs-toggle="modal" id="back">Back</button>
                 {% if form.course.choices|length > 0 %}
-                {{ form.submit(class="btn msuify-button")}}
+                <button class="btn msuify-button" onclick="verify_student(1, '{{student.id}}')" type="button">Submit</button>
                 {% endif %}
               </div>
             </div>
