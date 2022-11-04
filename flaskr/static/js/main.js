@@ -7,6 +7,7 @@ $('document').ready(function(){
     $('#course_searchbar').on('input',course_search)
     $('#course_filter').on('change',course_search)
     $('#student_searchbar').on('input', student_search)
+    $('#student_filter').on('input', student_search)
 })
 
 function student_search(){

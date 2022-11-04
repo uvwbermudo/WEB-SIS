@@ -23,13 +23,6 @@ def students():
 
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
-
-    if 'from_search' in session and session['from_search'] == True:
-        session['from_search'] = False
-        students = searchbar_query(
-            filter=session['search_filter'],
-            search_query=session['search_query'],
-        )
     return render_template('student/students.html', form=form, students=students)
 
 @student_view.route('/student-verify', methods=['POST','GET'])
@@ -137,6 +130,17 @@ def searchbar_query(filter, search_query):
             Students.last_name.contains(search_query) |
             Students.first_name.contains(search_query)
             ).all()
+    elif filter =='course':
+        if search_query.isspace() or search_query =='':
+            return Students.query.all()
+        course = Courses.query.filter(
+            Courses.course_name.contains(search_query)|
+            Courses.course_code.contains(search_query)).first()
+
+        course = course.course_code
+        return Students.query.filter(
+            Students.course_code == course).all()
+        
     else:
         return Students.query.filter(
             Students.id.contains(search_query)|

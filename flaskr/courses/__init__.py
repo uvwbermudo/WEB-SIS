@@ -140,6 +140,16 @@ def searchbar_query(filter, search_query):
         return Courses.query.filter(
             Courses.course_name.contains(search_query)
             ).all() 
+    elif filter == 'college':
+        if search_query.isspace() or search_query =='':
+            return Courses.query.all()
+        college = Colleges.query.filter(
+            Colleges.college_name.contains(search_query)|
+            Colleges.college_code.contains(search_query)).first()
+
+        college = college.college_code
+        return Courses.query.filter(
+            Courses.college_code == college).all()
     else:
         return Courses.query.filter(
             Courses.course_code.contains(search_query)|

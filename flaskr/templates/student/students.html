@@ -26,26 +26,24 @@ text-light
               <a href="/students" class="btn btn-secondary w-100"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
             </div>
 
-            <div class="col col-lg-1">
+            <div class="col col-lg-2">
             </div>
-            <div class="container col-lg-5 p-1">
+            <div class="container col-lg-6 p-1">
               <div class="row">
-                  <div class="col-3 p-0">
+                  <div class="col-4 p-0 ps-2">
                     <select name="searchfield" id="student_filter" class="form-select">
                       <option selected> Filter by</option>
                       <option value="id">ID</option>
                       <option value="name">Name</option>
+                      <option value="course">Course</option>
                     </select>
                   </div>
-                  <div class="col-9 p-0 px-1 pe-2">
+                  <div class="col-8 p-0 px-1 pe-2">
                     <input class="form-control shadow-sm" type="search" placeholder="Search a student" aria-label="Search" name="searchbar" id="student_searchbar">
                   </div>
               </div>
             </div>
-            
-            <div class="col-lg-2 p-1">
-              <button class="btn btn-success shadow-sm btn-md w-100" type="submit"> Search</button>
-            </div>
+
             
           </div> 
       </form>
@@ -110,7 +108,7 @@ text-light
 <!-- Table -->
 <div class="container mt-3 bg-white rounded-1 py-2 shadow-sm">
   <div class="table-responsive-md overflow-x-scroll" id="student_tc">
-    <table class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 720px;">
+    <table class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 600px;">
       <thead id="student_thead">
   
         <tr>
@@ -118,7 +116,7 @@ text-light
           <th scope="col-5" class="py-3">Last Name</th>
           <th scope="col-5" class="py-3">First Name </th>
           <th scope="col-5" class="py-3">Course</th>
-          <th scope="col-5" class="py-3">Year Level</th>
+          <th scope="col-5" class="py-3">Year</th>
           <th scope="col-5" class="py-3">Gender</th>
           
 
