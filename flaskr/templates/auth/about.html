@@ -1,12 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=h1, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>HELLO FROM ABOUT</h1>
-</body>
-</html>l
+{% extends 'base.html'%}
+
+{% block navbar %}
+
+{% endblock %}
+
+{% block bg %}
+
+{% endblock %}
+
+{% block body %}
+
+<section class="p-5" id="learn">
+    <div class="container">
+        <div class="row align-items-center justify-content-between">
+            <div class="col-md">
+                <img src="../../static/img/fundamentals.svg" class="img-fluid" alt="">
+            </div>
+            <div class="p-5 col-md">
+                <h2>About the project</h2>
+                <p class="lead">This project <span class="fw-semibold">Student Information System</span> is made by 
+                    <a href="http://facebook.com/nv06315" class="text-decoration-none text-dark">
+                        Urel Van William Bermudo
+                    </a> as part of his CCC181 Application Development and Emerging Techonologies course.
+                </p>
+                <p>This Homework/Project was made using HTML, CSS, Bootstrap, JavaScript, JQuery, Python, Flask, SQLAlchemy and the Fetch API.</p>
+            <div class="col-md">
+                <span class="">Contact me</span>
+                <div class="justify-content-end">
+                <a href="https://github.com/uvwbermudo" class="m-0"><i class="bi-github text-dark"></i></a>
+                <a href="https://facebook.com/nv06315" class="m-0"><i class="bi-facebook text-dark"></i></a>
+                <a href ="mailto: urelvan1@gmail.com" class="m-0"><i class="bi-envelope-fill text-dark"></i></a>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

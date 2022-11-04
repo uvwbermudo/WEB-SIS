@@ -23,18 +23,18 @@ text-light
           {{ form.csrf_token}}
           <div class="row gx-5">
             <div class="col-lg-2 p-1 d-flex justify-content-start">
-                <button class="btn btn-success shadow-sm w-100" type="button" data-bs-toggle="modal" data-bs-target="#addcollege"> Add College</button>
+                <button class="btn btn-success myshadow w-100" type="button" data-bs-toggle="modal" data-bs-target="#addcollege"> Add College</button>
               </div>
             
             <div class="col-lg-2 p-1">
-              <a href="/colleges" class="btn btn-secondary w-100"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
+              <a href="/colleges" class="btn btn-secondary w-100 myshadow"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
             </div>
             <div class="col col-lg-2">
             </div>
             <div class="col-lg-6 p-1">
               <div class="row">
                 <div class="col-4 p-0 ps-2">
-                  <select name="searchfield" id="college_filter" name="searchfilter" class="form-select">
+                  <select name="searchfield" id="college_filter" name="searchfilter" class="form-select myshadow squarify">
                     <option value="" selected> Filter by</option>
                     <option value="college_code">College Code</option>
                     <option value="college_name">Name</option>
@@ -43,7 +43,7 @@ text-light
         
                 
                 <div class="col-8 p-0 px-1 pe-2">
-                  <input class="form-control shadow-sm" type="search" placeholder="Search a College" aria-label="Search" id="college_searchbar" name="searchbar">
+                  <input class="form-control myshadow squarify" type="search" placeholder="Search a College" aria-label="Search" id="college_searchbar" name="searchbar">
                 </div>
               </div>
             </div>
@@ -65,11 +65,11 @@ text-light
               </div>
               <form action="/college-add" method="POST">
               <div class="modal-body">
-                  {{ form.college_code.label(class="form-label") }}
+                  {{ form.college_code.label(class="form-label fw-semibold") }}
                   {{ form.college_code(class="form-control") }} 
                   <span></span>
                   <br/>
-                  {{ form.college_name.label(class="form-label") }}
+                  {{ form.college_name.label(class="form-label fw-semibold") }}
                   {{ form.college_name(class="form-control") }} 
                   <span></span>
                   <br/>
@@ -89,27 +89,27 @@ text-light
   </div>
   {% else %}
 
-  <div id="college_tc" class="container mt-3 bg-white rounded-2 py-2 shadow-sm">
+  <div id="college_tc" class="container mt-3 rounded-2 py-2 ">
     <div class="table-responsive-md overflow-x-scroll">
-      <table id="college_table" class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 700px;">
-        <thead id="college_thead">
+      <table id="college_table" class="table align-middle mb-0 bg-white table-hover myshadow"  style="min-width: 700px;">
+        <thead id="college_thead" class="msuify">
     
           <tr>
-            <th scope="col-2" class="py-3 ps-5">College Code</th>
-            <th scope="col-5" class="py-3">College Name</th>
-            <th scope="col-5" class="py-3">Action</th>
+            <th scope="col-2" width="25%" class="py-3 ps-5">College Code</th>
+            <th scope="col-5" width="45%" class="py-3">College Name</th>
+            <th scope="col-5" width="25%" class="py-3"><div class="d-flex justify-content-center my-0">Action</div></th>
           </tr>
         
         </thead>
-        <tbody id="college_tbody" class="table-group-divider">
+        <tbody id="college_tbody" class="">
         {% for college in colleges %}
         <tr id="college_row">
             <th scope="row" class="ps-5">{{ college.college_code }}</th>
             <td>{{ college.college_name }}</td>
-            <td class="pe-0">
-                <a href="/college-verify/{{college.college_code}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcollege{{college.college_code}}" style="width: 120px;">Edit</a>
+            <td class="pe-0 text-center">
+                <a href="/college-verify/{{college.college_code}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcollege{{college.college_code}}" style="width: 100px;"> <i class="bi-pencil-fill"></i> </a>
 
-                <button class="btn btn-danger btn-sm my-1" type="button" aria-pressed="true" style="width: 120px;" data-bs-target="#confirmdelete{{college.college_code}}" data-bs-toggle="modal">Delete</button>
+                <button class="btn btn-danger btn-sm my-1" type="button" aria-pressed="true" style="width: 100px;" data-bs-target="#confirmdelete{{college.college_code}}" data-bs-toggle="modal"><i class="bi-trash-fill"></i></button>
 
             </td>
         </tr>
@@ -125,12 +125,12 @@ text-light
                     
                     <div class="modal-body">
                         
-                        {{ form.college_code.label(class="form-label") }}
+                        {{ form.college_code.label(class="form-label fw-semibold") }}
                         {% set college_code, college_name = college.college_code, college.college_name%}
                         {{ form.college_code(class="form-control college_code edit", value=college_code) }}
                         <span></span>
                         <br/>
-                        {{ form.college_name.label(class="form-label") }}
+                        {{ form.college_name.label(class="form-label fw-semibold") }}
                         {{ form.college_name(class="form-control college_name edit", value=college_name) }} 
                         <span></span>
                         <br/>

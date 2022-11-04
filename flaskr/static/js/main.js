@@ -1,14 +1,19 @@
 const csrf = $('#csrf_token').val();
 
-$('document').ready(function(){
 
+
+$('document').ready(function(){
+    
     $('#college_searchbar').on('input', search_college)
     $('#college_filter').on('change', search_college)
     $('#course_searchbar').on('input',course_search)
     $('#course_filter').on('change',course_search)
     $('#student_searchbar').on('input', student_search)
     $('#student_filter').on('input', student_search)
+
+    
 })
+
 
 function student_search(){
     var search_query = $('#student_searchbar').val()
@@ -30,22 +35,27 @@ function student_search(){
             }),
       }).then(response => (response.json()))
       .then(function(response){
-          console.log(response)
+          console.log(response[0])
           student_tbody.html('')
           for(var i=0; i<response[0].length; i++){
+              
+             course = response[0][i][6]
+             year = response[0][i][4]
+             gender = response[0][i][5]
+            
             student_tbody.append(`
             <tr>
-            <th scope="row" class="ps-5">${response[0][i][0]}</th>
+            <th scope="row" class="text-center">${response[0][i][0]}</th>
             <td>${response[0][i][1]}</td>
             <td>${response[0][i][2]}</td>
             <td id="student_course${response[0][i][0]}"></td>
             <td>${response[0][i][4]}</td>
             <td>${response[0][i][5]}</td>
   
-            <td class="pe-0">
-                <a href="/student-edit/${response[0][i][0]}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editstudent${response[0][i][0]}" style="width: 120px;">Edit</a>
+            <td class="pe-0 text-center">
+                <a href="/student-edit/${response[0][i][0]}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editstudent${response[0][i][0]}" style="width: 100px;" onmouseover="set_selectfield('${course}','${year}','${gender}')"><i class="bi-pencil-fill"></i></a>
   
-                <a href="/student-delete/${response[0][i][0]}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 120px;" data-bs-target="#confirmdelete${response[0][i][0]}" data-bs-toggle="modal">Delete</a>
+                <a href="/student-delete/${response[0][i][0]}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 100px;" data-bs-target="#confirmdelete${response[0][i][0]}" data-bs-toggle="modal"><i class="bi-trash-fill"></i></a>
   
             </td>
             `)
@@ -83,22 +93,24 @@ function course_search(){
       .then(function(response) {
             console.log(response[0])
             course_tbody.html('')
-
-      for(var i = 0; i<response[0].length; i++){
+        for(var i = 0; i<response[0].length; i++){
+        
+        
         course_tbody.append(
             '<tr>'+
-            '<th scope="row" class="ps-5">'+response[0][i][0]+'</th>'+
+            '<th scope="row" class="text-center">'+response[0][i][0]+'</th>'+
             '<td>'+response[0][i][1]+'</td>'+
             '<td id="course_college'+response[0][i][0]+'"></td>'+
             
-            '<td class="pe-0">'+
-                '<a href="/course-edit/'+response[0][i][0]+'"class="btn btn-warning btn-sm my-1 me-1" role="button"'+ 'aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcourse'+response[0][i][0]+'" style="width:'+ '120px;">Edit</a>'+
+            '<td class="pe-0 text-center">'+
+                '<a href="/course-edit/'+response[0][i][0]+'"class="btn btn-warning btn-sm my-1 me-1" role="button"'+ 'aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcourse'+response[0][i][0]+'" style="width:'+ `100px;" onmouseover="course_selectfield('${response[0][i][3]}')"><i class="bi-pencil-fill"></i></a>`+
   
-                '<a href="/course-delete/'+response[0][i][0]+'" class="btn btn-danger btn-sm my-1" role="button"'+ 'aria-pressed="true" style="width: 120px;" data-bs-target="#confirmdelete'+response[0][i][0]+'"'+ 'data-bs-toggle="modal">Delete</a>'+
+                '<a href="/course-delete/'+response[0][i][0]+'" class="btn btn-danger btn-sm my-1" role="button"'+ 'aria-pressed="true" style="width: 100px;" data-bs-target="#confirmdelete'+response[0][i][0]+'"'+ 'data-bs-toggle="modal"><i class="bi-trash-fill"></i></a>'+
   
             '</td>'+
             '</tr>'
         )
+
         if (!response[0][i][2]){
             $('#course_college'+response[0][i][0]).html('<p class="fst-italic fw-light my-auto h-50">College Removed</p>')
         }
@@ -130,19 +142,20 @@ function search_college(){
     }).then(response => (response.json()))
     .then(function(response) {
         college_tbody.html('')
-
+        
         for(var i = 0; i<response[0].length; i++){
           college_tbody.append(
           '<tr id="college_row">'+
               '<th scope="row" class="ps-5">'+response[0][i][0]+'</th>'+
               '<td>'+response[0][i][1]+'</td>'+
-              '<td class="pe-0">'+
-                  '<a href="/college-edit/'+response[0][i][0]+'"class="btn btn-warning btn-sm my-1 me-1" role="button"'+ 'aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcollege'+response[0][i][0]+'" style="width:'+ '120px;">Edit</a>'+
+              '<td class="pe-0 text-center">'+
+                  '<a href="/college-edit/'+response[0][i][0]+'"class="btn btn-warning btn-sm my-1 me-1" role="button"'+ 'aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcollege'+response[0][i][0]+'" style="width:'+ '100px;"><i class="bi-pencil-fill"></i></a>'+
   
-                  '<button class="btn btn-danger btn-sm my-1" type="button" aria-pressed="true" style="width: 120px;"'+ 'data-bs-target="#confirmdelete'+response[0][i][0]+'" data-bs-toggle="modal">Delete</button>'+
+                  '<button class="btn btn-danger btn-sm my-1" type="button" aria-pressed="true" style="width: 100px;"'+ 'data-bs-target="#confirmdelete'+response[0][i][0]+'" data-bs-toggle="modal"><i class="bi-trash-fill"></i></button>'+
               '</td>'+
               '</tr>'
           )
+          
       }      
   })
 }
@@ -424,4 +437,15 @@ function verify_student(mode,hid=0) {
                 }
             })
         })
+}
+
+function set_selectfield(code,year,gender){
+    $('.set_course').val(code)
+    $('.set_year').val(year)
+    $('.set_gender').val(gender)
+    console.log('working?')
+}
+
+function course_selectfield(college) {
+    $('.set_college').val(college)
 }

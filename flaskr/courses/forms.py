@@ -13,7 +13,7 @@ class AddCourse(FlaskForm):
             DataRequired(message='Course Code is required'), 
             Regexp(
                 '\A\w+( \w+)*\Z', 
-                message='Cannot Submit, Invalid format for Course Code. (Unnecessary Space)',
+                message='Cannot submit, contains invalid characters',
                 ),
             ],
         render_kw={'placeholder':"e.g. 'BSCS'"},
@@ -26,7 +26,7 @@ class AddCourse(FlaskForm):
             validators.DataRequired(message='Course Name is required'),
             validators.Regexp(
                 '\A\w+( \w+)*\Z', 
-                message='Cannot Submit, Invalid Format for Course Name. (Unnecessary Space)',
+                message='Cannot submit, contains invalid characters.',
                 ),
             ],
         )

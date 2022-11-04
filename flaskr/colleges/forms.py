@@ -12,7 +12,7 @@ class AddCollege(FlaskForm):
             DataRequired(message='College Code is required'),
             Regexp(
                 '\A\w+( \w+)*\Z', 
-                message='Cannot Submit, Invalid Format for College Code. (Unnecessary Spaces)',
+                message='Cannot submit, contains invalid characters',
                 ),
             ],
         render_kw={'placeholder':"e.g. 'CCS'"}
@@ -25,11 +25,10 @@ class AddCollege(FlaskForm):
             DataRequired(message='College Name is required'),
             Regexp(
                 '\A\w+( \w+)*\Z',
-                message='Cannot Submit, Invalid Format for College Name. (Unnecessary Spaces)',
+                message='Cannot submit, contains invalid characters',
                 ),
             ],
         )
-    submit = SubmitField("Submit")
 
 
 

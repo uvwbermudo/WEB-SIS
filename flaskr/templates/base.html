@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../static/css/style.css">
     <title>{% block title%}{% endblock%}</title>
 </head>
@@ -19,20 +23,23 @@
             <button class="btn-close float-end" type="button" data-bs-dismiss="alert" aria-label="Close">
             </button>
         </div>
-        
+
         {% else %}
         <div class="alert alert-success alert-dismissable fade show" role="alert">
             <strong>{{ message }}</strong>
             <button class="btn-close float-end" type="button" data-bs-dismiss="alert" aria-label="Close">
             </button>
         </div>
+
         {% endif %}
         {% endfor %}
     {% endif %}
+ 
     {% endwith %}
+
     
     <header>
-        <nav class="navbar bg-light navbar-expand-md p-2 fixed-top shadow-sm">
+        <nav class="navbar bg-light navbar-expand-md p-2 fixed-top myshadow">
             <div class="container-fluid align-content-center">
                 <a href="/" class="navbar-brand msu-text">
                 <img src="../../static/img/logo2.jpg" alt="MSU-IIT Logo" width="40" height="40" class="me-2">
@@ -44,6 +51,9 @@
                 </button>
                 <div class="collapse navbar-collapse justify-content-end" id="headnavbar">
                     <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link msu-text-link">Home</a>
+                        </li>
                         <li class="nav-item">
                             <a href="/about" class="nav-link msu-text-link">About</a>
                         </li>
@@ -57,10 +67,11 @@
         </nav>
     </header>
     
-<body class="body-darkwhite before-space body-img2">
+<body class="before-space {% block bg %}body-img3 {% endblock %}">
     <!-- NAVBAR 2 -->
+    {% block navbar %}
     <input class="p-0 m-0" type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}">
-    <div class="container px-1 py-1 mt-5 bg-white w-75 rounded-1 pill shadow-sm">
+    <div class="container px-0 mt-5 bg-white w-75 pill myshadow">
         <ul class="nav nav-pills nav-fill">
 
             <li class="nav-item {% block studentpill %}{% endblock %}">
@@ -76,11 +87,13 @@
             </li>
           </ul>
     </div>
+    {% endblock %}
     {% block body %}{% endblock %}
     <script src="https://code.jquery.com/jquery-3.6.1.js"
     integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
     crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script type="text/javascript">
         var csrf_token = "{{ csrf_token() }}";
     
@@ -92,8 +105,8 @@
             }
         });
 
+    
     </script>
-    {# testing enevt listeners #}
     <script type="text/javascript" src="../../static/js/main.js"></script>
 
 </body>

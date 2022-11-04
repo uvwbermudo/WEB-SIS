@@ -29,7 +29,7 @@ class AddStudent(FlaskForm):
             DataRequired(message='First name is Required'), 
             Regexp(
                 '\A\w+( \w+)*\Z', 
-                message='Cannot Submit, Invalid format for First Name. (Unnecessary Spaces)',
+                message='Cannot submit, contains invalid characters',
                 ),
             ],
         )
@@ -41,7 +41,7 @@ class AddStudent(FlaskForm):
             validators.DataRequired(message='Last name is Required'), 
             validators.Regexp(
                 '\A\w+( \w+)*\Z', 
-                message='Cannot Submit, Invalid format for Last Name. (Unnecessary Spaces)',
+                message='Cannot submit, contains invalid characters',
                 ),
             ],
         )

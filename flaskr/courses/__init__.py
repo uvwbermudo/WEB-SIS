@@ -26,7 +26,7 @@ def courses():
     session['college_choices'] = colleges
     courses = Courses.query.all()
             
-    return render_template('courses/courses.html', form=form, courses=courses)
+    return render_template('courses/courses.html', form=form, courses=courses, college_choices=colleges)
 
 @courses_view.route('/course-verify', methods=['GET','POST'])
 @login_required
@@ -91,10 +91,20 @@ def course_verify():
 
         else:
             errors = get_error_items(form)
-            if check:
-                errors['course_code']= ['Course Code is already being used.']
-            if check_name:
-                errors['course_name']= ['Course name is already being used.']
+
+
+            if mode == 1:
+                if check and check.course_code != old_code:
+                    errors['course_code']= ['Course Code is already being used.']
+                if check_name and check_name.course_code != old_code:
+                    errors['course_name']= ['Course name is already being used.']
+            else:
+                if check:
+                    errors['course_code']= ['Course Code is already being used.']
+                if check_name:
+                    errors['course_name']= ['Course name is already being used.']
+
+            
             return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
     
 
@@ -125,9 +135,10 @@ def col_to_list(list):
     for course in list:
         if course.college:
             college_name = course.college.college_name
+            college_code = course.college.college_code
         else:
             college_name = None
-        temp.append([course.course_code, course.course_name, college_name])
+        temp.append([course.course_code, course.course_name, college_name, college_code])
     return temp
 
 

@@ -21,18 +21,18 @@ text-light
             {{ form.csrf_token}}
             <div class="row gx-5">
               <div class="col-lg-2 p-1 d-flex justify-content-start">
-                  <button class="btn btn-success shadow-sm w-100" type="button" data-bs-toggle="modal" data-bs-target="#addcourse"> Add Course</button>
+                  <button class="btn btn-success myshadow w-100" type="button" data-bs-toggle="modal" data-bs-target="#addcourse"> Add Course</button>
                 </div>
               
               <div class="col-lg-2 p-1">
-                <a href="/courses" class="btn btn-secondary w-100"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
+                <a href="/courses" class="btn btn-secondary myshadow w-100"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
               </div>
               <div class="col col-lg-2">
               </div>
               <div class="col-lg-6 p-1">
                 <div class="row">
                   <div class="col-4 p-0 ps-2">
-                    <select name="course_filter" id="course_filter" class="form-select">
+                    <select name="course_filter" id="course_filter" class="form-select myshadow squarify">
                       <option selected> Filter by</option>
                       <option value="course_code">Course Code</option>
                       <option value="course_name">Name</option>
@@ -40,7 +40,7 @@ text-light
                     </select>
                   </div>
                   <div class="col-8 p-0 px-1 pe-2">
-                    <input class="form-control shadow-sm" type="search" placeholder="Search a Course" aria-label="Search" name="course_searchbar" id="course_searchbar">
+                    <input class="form-control myshadow squarify" type="search" placeholder="Search a Course" aria-label="Search" name="course_searchbar" id="course_searchbar">
                   </div>
               </div>
               </div>
@@ -61,15 +61,15 @@ text-light
           </div>
           <form action="/course-add" method="POST">
           <div class="modal-body">
-              {{ form.course_code.label(class="form-label") }}
+              {{ form.course_code.label(class="form-label fw-semibold") }}
               {{ form.course_code(class="form-control") }}  
               <span></span>
               <br/>
-              {{ form.course_name.label(class="form-label") }}
+              {{ form.course_name.label(class="form-labe fw-semibold") }}
               {{ form.course_name(class="form-control") }} 
               <span></span>
               <br/>
-              {{ form.college.label(class="form-label") }}
+              {{ form.college.label(class="form-label fw-semibold") }}
               {% if form.college.choices|length > 0 %}
               {{ form.college(class="form-select") }}
               {% else %}
@@ -90,28 +90,28 @@ text-light
 
 {% if courses == None or courses|length == 0 %}
 <div class="container d-flex justify-content-center pt-5">
-  <h1 class="text-muted display-5">No results</h1>
+  <h1 class="text-muted display-5">No Courses at the moment</h1>
 </div>
 {% else %}
 
 <!-- Table -->
-<div class="container mt-3 bg-white rounded-1 py-2 shadow-sm" id="course_tc">
+<div class="container mt-3 py-2 " id="course_tc">
   <div class="table-responsive-md overflow-x-scroll">
-    <table class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 720px;">
-      <thead id="course_thead">
+    <table class="table align-middle mb-0 bg-white table-hover myshadow"  style="min-width: 600px;">
+      <thead id="course_thead" class="msuify">
   
         <tr>
-          <th scope="col-2" class="py-3 ps-5">Course Code</th>
-          <th scope="col-5" class="py-3">Course Name</th>
-          <th scope="col-5" class="py-3">College </th>
-          <th scope="col-5" class="py-3">Action</th>
+          <th scope="col" width="15%" class="py-3"><div class=" my-0 d-flex justify-content-center">Course Code</div></th>
+          <th scope="col" width="35%" class="py-3">Course Name</th>
+          <th scope="col" width="25%" class="py-3">College </th>
+          <th scope="col" width="25%" class="py-3"><div class=" my-0 d-flex justify-content-center">Action</div></th>
         </tr>
       
       </thead>
-      <tbody class="table-group-divider" id="course_tbody">
+      <tbody class="" id="course_tbody">
       {% for course in courses %}
       <tr>
-          <th scope="row" class="ps-5">{{ course.course_code }}</th>
+          <th scope="row" class="text-center">{{ course.course_code }}</th>
           <td>{{ course.course_name }}</td>
           {% if course.college %}
           <td>{{ course.college.college_name }}</td>
@@ -120,10 +120,10 @@ text-light
           {% endif %}
           <script>
           </script>
-          <td class="pe-0">
-              <a href="/course-edit/{{course.course_code}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcourse{{course.course_code}}" style="width: 120px;">Edit</a>
+          <td class="pe-0 text-center">
+              <a href="/course-edit/{{course.course_code}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcourse{{course.course_code}}" style="width: 100px;" onmouseover="course_selectfield('{{course.college.college_code}}')"><i class="bi-pencil-fill"></i></a>
 
-              <a href="/course-delete/{{course.course_code}}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 120px;" data-bs-target="#confirmdelete{{course.course_code}}" data-bs-toggle="modal">Delete</a>
+              <a href="/course-delete/{{course.course_code}}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 100px;" data-bs-target="#confirmdelete{{course.course_code}}" data-bs-toggle="modal"><i class="bi-trash-fill"></i></a>
 
           </td>
       </tr>
@@ -142,18 +142,18 @@ text-light
                       {{ form.csrf_token }}
                       <input type="hidden" value="{{ course.course_code }}" id="hid" name="hid" style="padding: 0;">
                       
-                      {{ form.course_code.label(class="form-label") }}
+                      {{ form.course_code.label(class="form-label fw-semibold") }}
                       {% set course_code, course_name, college = course.course_code, course.course_name, course.college_code %}
                       {{ form.course_code(class="form-control", value=course_code) }}
                       <span></span>
                       <br/>
-                      {{ form.course_name.label(class="form-label") }}
+                      {{ form.course_name.label(class="form-label fw-semibold") }}
                       {{ form.course_name(class="form-control", value=course_name) }} 
                       <span></span>
                       <br/>
-                      {{ form.college.label(class="form-label")}}
+                      {{ form.college.label(class="form-label fw-semibold")}}
                       {% if form.college.choices|length > 0 %}
-                      {{ form.college(class="form-control", value=college)}}
+                      {{ form.college(class="form-select set_college", value=college)}}
                       {% else %}
                             <input type="text" class="form-control" disabled="true", placeholder="No available colleges at the moment">
                       {% endif %}

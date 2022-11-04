@@ -46,7 +46,6 @@ def student_verify():
             if mode == 1:               # mode = 1 is for editing
                 errors = get_error_items(form)
                 if check and check.id != old_id:
-                    print('!1111222')
                     errors['id']= ['ID Number is already being used.']
                     return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
             
@@ -83,8 +82,12 @@ def student_verify():
 
         else:
             errors = get_error_items(form)
-            if check:
-                errors['id']= ['ID Number is already being used.']
+            if mode == 1:
+                if check and check.id != old_id:
+                    errors['id']= ['ID Number is already being used.']
+            else:
+                if check:
+                    errors['id']= ['ID Number is already being used.']
             return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
         
 
@@ -117,7 +120,7 @@ def col_to_list(list):
             course_name = student.course.course_name
         else:
             course_name = None
-        temp.append([student.id, student.last_name, student.first_name, course_name, student.year, student.gender])
+        temp.append([student.id, student.last_name, student.first_name, course_name, student.year, student.gender, student.course.course_code])
     return temp
 
 def searchbar_query(filter, search_query):  

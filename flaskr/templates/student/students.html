@@ -19,11 +19,11 @@ text-light
           {{ form.csrf_token}}
           <div class="row gx-5">
             <div class="col-lg-2 p-1 d-flex justify-content-start">
-                <button class="btn btn-success shadow-sm w-100" type="button" data-bs-toggle="modal" data-bs-target="#addstudent"> Add Student</button>
+                <button class="btn btn-success myshadow w-100" type="button" data-bs-toggle="modal" data-bs-target="#addstudent"> Add Student</button>
               </div>
             
             <div class="col-lg-2 p-1">
-              <a href="/students" class="btn btn-secondary w-100"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
+              <a href="/students" class="btn btn-secondary w-100 myshadow"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
             </div>
 
             <div class="col col-lg-2">
@@ -31,7 +31,7 @@ text-light
             <div class="container col-lg-6 p-1">
               <div class="row">
                   <div class="col-4 p-0 ps-2">
-                    <select name="searchfield" id="student_filter" class="form-select">
+                    <select name="searchfield" id="student_filter" class="form-select myshadow squarify">
                       <option selected> Filter by</option>
                       <option value="id">ID</option>
                       <option value="name">Name</option>
@@ -39,7 +39,7 @@ text-light
                     </select>
                   </div>
                   <div class="col-8 p-0 px-1 pe-2">
-                    <input class="form-control shadow-sm" type="search" placeholder="Search a student" aria-label="Search" name="searchbar" id="student_searchbar">
+                    <input class="form-control myshadow squarify" type="search" placeholder="Search a student" aria-label="Search" name="searchbar" id="student_searchbar">
                   </div>
               </div>
             </div>
@@ -53,33 +53,33 @@ text-light
 <!-- ADD STUDENT -->
 <form action="/student-add" method="POST">
   <div class="modal fade" id="addstudent" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog  modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered   modal-dialog-scrollable">
+        <div class="modal-content ">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="staticBackdropLabel">Add a Student</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           
           <div class="modal-body">
-              {{ form.id.label(class="form-label") }}
+              {{ form.id.label(class="form-label fw-semibold") }}
               {{ form.id(class="form-control") }}  
               <span></span>
               <br/>
-              {{ form.last_name.label(class="form-label") }}
+              {{ form.last_name.label(class="form-label fw-semibold") }}
               {{ form.last_name(class="form-control") }} 
               <span></span>
               <br/>
-              {{ form.first_name.label(class="form-label") }}
+              {{ form.first_name.label(class="form-label fw-semibold") }}
               {{ form.first_name(class="form-control") }}
               <span></span>
               <br/>
-              {{ form.year.label(class="form-label") }}
+              {{ form.year.label(class="form-label fw-semibold") }}
               {{ form.year(class="form-select") }}
               <br/>
-              {{ form.gender.label(class="form-label") }}
+              {{ form.gender.label(class="form-label fw-semibold") }}
               {{ form.gender(class="form-select") }}
               <br/>
-              {{ form.course.label(class="form-label") }}
+              {{ form.course.label(class="form-label fw-semibold") }}
               {% if form.course.choices|length > 0 %}
               {{ form.course(class="form-select") }}
               {% else %}
@@ -101,32 +101,34 @@ text-light
 
 {% if students == None or students|length == 0 %}
 <div class="container d-flex justify-content-center pt-5">
-  <h1 class="text-muted display-5">No results</h1>
+  <h1 class="text-muted display-5">No Students at the moment</h1>
 </div>
 {% else %}
 
 <!-- Table -->
-<div class="container mt-3 bg-white rounded-1 py-2 shadow-sm">
+<div class="container mt-3 rounded-1 py-2">
   <div class="table-responsive-md overflow-x-scroll" id="student_tc">
-    <table class="table align-middle mb-0 bg-white table-hover sampleTable"  style="min-width: 600px;">
-      <thead id="student_thead">
+    <table class="table align-middle mb-0 bg-white table-hover myshadow"  style="min-width: 600px;">
+      <thead id="student_thead" class="msuify">
   
         <tr>
-          <th scope="col-2" class="py-3 ps-5">ID Number</th>
-          <th scope="col-5" class="py-3">Last Name</th>
-          <th scope="col-5" class="py-3">First Name </th>
-          <th scope="col-5" class="py-3">Course</th>
-          <th scope="col-5" class="py-3">Year</th>
-          <th scope="col-5" class="py-3">Gender</th>
-          
-
+          <th width="15%" scope="col" class="py-3"><div class="my-0 d-flex justify-content-center ">ID Number</div></th>
+          <th width="15%" scope="col" class="py-3">Last Name</th>
+          <th width="15%" scope="col" class="py-3">First Name </th>
+          <th width="20%" scope="col" class="py-3">Course</th>
+          <th width="5%" scope="col" class="py-3">Year</th>
+          <th width="5%" scope="col" class="py-3">Gender</th>
+          <th width="25%" scope="col" class="py-3"><div class="my-0 d-flex justify-content-center ">Action</div></th>
+  
         </tr>
       
       </thead>
-      <tbody class="table-group-divider" id="student_tbody">
+
+      <tbody class="" id="student_tbody">
       {% for student in students %}
+      {% set id, last_name, first_name, year, gender, course = student.id,student.last_name, student.first_name, student.year, student.gender, student.course_code %}
       <tr>
-          <th scope="row" class="ps-5">{{ student.id }}</th>
+          <th scope="row" class="text-center">{{ student.id }}</th>
           <td>{{ student.last_name }}</td>
           <td>{{ student.first_name }}</td>
           {% if student.course %}
@@ -134,13 +136,13 @@ text-light
           {% else %}
           <td> <p class="fst-italic fw-light my-auto h-50">Course Removed</p> </td>
           {% endif %}
-          <td>{{ student.year }}</td>
-          <td>{{ student.gender }}</td>
+          <td class ="text-center">{{ student.year }}</td>
+          <td class ="text-center">{{ student.gender }}</td>
 
-          <td class="pe-0">
-              <a href="/student-edit/{{student.id}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editstudent{{student.id}}" style="width: 120px;">Edit</a>
+          <td class="pe-0 text-center">
+              <a href="/student-edit/{{student.id}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editstudent{{student.id}}" style="width: 100px;" onmouseover="set_selectfield('{{course}}','{{year}}','{{gender}}')"><i class="bi-pencil-fill" ></i></a>
 
-              <a href="/student-delete/{{student.id}}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 120px;" data-bs-target="#confirmdelete{{student.id}}" data-bs-toggle="modal">Delete</a>
+              <a href="/student-delete/{{student.id}}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 100px;" data-bs-target="#confirmdelete{{student.id}}" data-bs-toggle="modal" ><i class="bi-trash-fill"></i></a>
 
           </td>
       </tr>
@@ -157,30 +159,29 @@ text-light
                   
                   <div class="modal-body">
                       <input type="hidden" value="{{ student.id }}" id="hid" name="hid" style="padding: 0;">
-                      
-                      {% set id, last_name, first_name, year, gender, course = student.id,student.last_name, student.first_name, student.year, student.gender, student.course_code %}
+                    
 
-                      {{ form.id.label(class="form-label") }}
+                      {{ form.id.label(class="form-label  fw-semibold") }}
                       {{ form.id(class="form-control", value=id) }}  
                       <span></span>
                       <br/>
-                      {{ form.last_name.label(class="form-label") }}
+                      {{ form.last_name.label(class="form-label fw-semibold") }}
                       {{ form.last_name(class="form-control", value=last_name) }} 
                       <span></span>
                       <br/>
-                      {{ form.first_name.label(class="form-label") }}
+                      {{ form.first_name.label(class="form-label fw-semibold") }}
                       {{ form.first_name(class="form-control", value=first_name) }}
                       <span></span>
                       <br/>
-                      {{ form.year.label(class="form-label") }}
-                      {{ form.year(class="form-select", value=year) }}
+                      {{ form.year.label(class="form-label fw-semibold") }}
+                      {{ form.year(class="form-select set_year", value=year) }}
                       <br/>
-                      {{ form.gender.label(class="form-label") }}
-                      {{ form.gender(class="form-select", value=gender) }}
+                      {{ form.gender.label(class="form-label fw-semibold") }}
+                      {{ form.gender(class="form-select set_gender", value=gender) }}
                       <br/>
-                      {{ form.course.label(class="form-label") }}
+                      {{ form.course.label(class="form-label fw-semibold") }}
                       {% if form.course.choices|length > 0 %}
-                      {{ form.course(class="form-select", value=course) }}
+                      {{ form.course(class="form-select set_course") }}
                       {% else %}
                       <input type="text" class="form-control" disabled=True, placeholder="No available courses at the moment.">
                       {% endif %}
