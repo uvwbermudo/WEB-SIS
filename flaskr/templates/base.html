@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../static/css/style.css">
     <title>{% block title%}{% endblock%}</title>
@@ -18,14 +19,14 @@
     {% if messages %}
         {% for category, message in messages %}
         {% if category == 'error' %}
-        <div class="alert alert-danger alert-dismissable fade show" role="alert">
+        <div class="alert alert-danger alert-dismissable fade show dmsans" role="alert">
             <strong>{{ message }}</strong>
             <button class="btn-close float-end" type="button" data-bs-dismiss="alert" aria-label="Close">
             </button>
         </div>
 
         {% else %}
-        <div class="alert alert-success alert-dismissable fade show" role="alert">
+        <div class="alert alert-success alert-dismissable fade show dmsans" role="alert">
             <strong>{{ message }}</strong>
             <button class="btn-close float-end" type="button" data-bs-dismiss="alert" aria-label="Close">
             </button>
@@ -38,7 +39,7 @@
     {% endwith %}
 
     
-    <header>
+    <header class="dmsans">
         <nav class="navbar bg-light navbar-expand-md p-2 fixed-top myshadow">
             <div class="container-fluid align-content-center">
                 <a href="/" class="navbar-brand msu-text">
@@ -67,7 +68,7 @@
         </nav>
     </header>
     
-<body class="before-space {% block bg %}body-img3 {% endblock %}">
+<body class="before-space {% block bg %}body-img3 {% endblock %} dm-sans">
     <!-- NAVBAR 2 -->
     {% block navbar %}
     <input class="p-0 m-0" type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}">

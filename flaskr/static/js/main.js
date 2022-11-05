@@ -35,7 +35,6 @@ function student_search(){
             }),
       }).then(response => (response.json()))
       .then(function(response){
-          console.log(response[0])
           student_tbody.html('')
           for(var i=0; i<response[0].length; i++){
               
@@ -91,7 +90,6 @@ function course_search(){
             }),
       }).then(response => (response.json()))
       .then(function(response) {
-            console.log(response[0])
             course_tbody.html('')
         for(var i = 0; i<response[0].length; i++){
         
@@ -250,16 +248,12 @@ function verify_college(csrf, mode,hid=0) {
         .then(function(responses) {
             responses[1].forEach(function(field){
                 
-                console.log(responses[0])
                 if (field in responses[0]) {
                     
                     formfield = $('#'+field);
                     if (mode == 1){
                         $('div#confirm'+hid+' #back').click(); 
-                        
                         formfield = $('div#editcollege'+hid+' #'+field)
-                        console.log('div#editcollege'+hid+' #'+field)
-                        console.log(formfield)
                     }
                     formfieldnext = formfield.next();
                     formfield.css({"border-color":"red"});
@@ -320,9 +314,6 @@ function verify_course(mode,hid=0) {
         })
         .then(function(responses) {
             responses[1].forEach(function(field){
-                console.log(responses)
-                console.log(responses[0])
-                console.log('HEERE')
                 if (field == 'college'){
                     return;
                 }
@@ -333,8 +324,6 @@ function verify_course(mode,hid=0) {
                         $('div#confirm'+hid+' #back').click(); 
                         
                         formfield = $('div#editcourse'+hid+' #'+field)
-                        console.log('div#editcourse'+hid+' #'+field)
-                        console.log(formfield)
                     }
                     formfieldnext = formfield.next();
                     formfield.css({"border-color":"red"});
@@ -371,8 +360,6 @@ function verify_student(mode,hid=0) {
         gender = $('div#editstudent'+hid+' #gender')
         course = $('div#editstudent'+hid+' #course')
     }
-    console.log('FUCK ME')
-    console.log(student_id.val(),last_name.val(),first_name.val(),year.val(),gender.val(),course.val())
 
     fetch('/student-verify', {
         method: 'POST',     
@@ -405,8 +392,6 @@ function verify_student(mode,hid=0) {
         })  
         .then(function(responses) {
             responses[1].forEach(function(field){
-                console.log(responses)
-                console.log(responses[0])   
                 if (field == 'year' || field == 'gender' || field == 'course'){
                     return
                 }
@@ -417,8 +402,6 @@ function verify_student(mode,hid=0) {
                         $('div#confirm'+hid+' #back').click(); 
                         
                         formfield = $('div#editstudent'+hid+' #'+field)
-                        console.log('div#editstudent'+hid+' #'+field)
-                        console.log(formfield)
                     }
                     formfieldnext = formfield.next();
                     formfield.css({"border-color":"red"});
@@ -443,7 +426,6 @@ function set_selectfield(code,year,gender){
     $('.set_course').val(code)
     $('.set_year').val(year)
     $('.set_gender').val(gender)
-    console.log('working?')
 }
 
 function course_selectfield(college) {

@@ -94,11 +94,12 @@ html{
     height:80px;
 }
 
-* {
+.dmsans {
     font-family: 'DM Sans', sans-serif;
 }
-.montfont {
-    font-family: 'Montserrat', sans-serif;
+
+.poppins {
+    font-family: 'Poppins', sans-serif;
 }
 
 table {
@@ -123,12 +124,15 @@ table {
     border-radius: 0;
 }
 
-.btn {
-    font-size: 95%;
-}
-
 .squareme {
     border-radius:0;
     height: 40px;
     border-color: rgba(88, 88, 88, 0.452);
 }
+
+.authlabel {
+    font-size: 90%;
+    font-weight: 600;
+}
+
+

@@ -1,7 +1,7 @@
 {% extends "auth/base.html" %}
 
 
-{% block title %}Login{% endblock %}
+{% block title %}My.SIS Login{% endblock %}
 {% block body %}
 
     
@@ -11,11 +11,11 @@
             <img class="img-fluid w-50 " src="../../static/img/logo2.jpg" style="max-width: 150px; min-width: 100px;" alt="">
         </div>
         <form method="POST">
-            {{ form.email.label(class="form-label")}}
+            {{ form.email.label(class="form-label authlabel")}}
             {{ form.email(class="form-control form-email")}}
             <span></span>
             <br/>
-            {{ form.password.label(class="form-label")}}
+            {{ form.password.label(class="form-label authlabel")}}
             {{ form.password(class="form-control form-password")}}
             <span></span>
             <br/>
