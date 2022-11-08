@@ -51,8 +51,6 @@ def student_verify():
             
                 else:
                     target = Students.query.get(old_id)
-                    print(temp_json)
-                    print(target)
                     target.id = id_number
                     target.last_name = last_name
                     target.first_name = first_name
@@ -109,7 +107,8 @@ def student_search():
     if request.method == 'POST':
         search = request.json['search_query']
         filter = request.json['search_filter']
-        result = searchbar_query(filter=filter, search_query=search)
+        gender_filter = request.json['gender_filter']
+        result = searchbar_query(filter=filter, search_query=search, gender_filter=gender_filter)
         result = col_to_list(result)
         return Response(json.dumps([result]), status=298, mimetype='application/json')
 
@@ -123,30 +122,58 @@ def col_to_list(list):
         temp.append([student.id, student.last_name, student.first_name, course_name, student.year, student.gender, student.course.course_code])
     return temp
 
-def searchbar_query(filter, search_query):  
-    if filter == 'id':
-        return Students.query.filter(
-            Students.id.contains(search_query)
-            ).all()
-    elif filter == 'name':
-        return Students.query.filter(
-            Students.last_name.contains(search_query) |
-            Students.first_name.contains(search_query)
-            ).all()
-    elif filter =='course':
-        if search_query.isspace() or search_query =='':
-            return Students.query.all()
-        course = Courses.query.filter(
-            Courses.course_name.contains(search_query)|
-            Courses.course_code.contains(search_query)).first()
+def searchbar_query(filter, search_query, gender_filter):  
+    if gender_filter == 'all':
+        if filter == 'id':
+            return Students.query.filter(
+                Students.id.contains(search_query)
+                ).all()
+        elif filter == 'name':
+            return Students.query.filter(
+                Students.last_name.contains(search_query) |
+                Students.first_name.contains(search_query)
+                ).all()
+        elif filter =='course':
+            if search_query.isspace() or search_query =='':
+                return Students.query.all()
+            course = Courses.query.filter(
+                Courses.course_name.contains(search_query)|
+                Courses.course_code.contains(search_query)).first()
 
-        course = course.course_code
-        return Students.query.filter(
-            Students.course_code == course).all()
-        
+            course = course.course_code
+            return Students.query.filter(
+                Students.course_code == course).all()
+            
+        else:
+            return Students.query.filter(
+                Students.id.contains(search_query)|
+                Students.last_name.contains(search_query)|
+                Students.first_name.contains(search_query)
+                ).all()
     else:
-        return Students.query.filter(
-            Students.id.contains(search_query)|
-            Students.last_name.contains(search_query)|
-            Students.first_name.contains(search_query)
-            ).all()
+        if filter == 'id':
+            return Students.query.filter(
+                Students.id.contains(search_query)
+                ).filter(Students.gender == gender_filter).all()
+        elif filter == 'name':
+            return Students.query.filter(
+                Students.last_name.contains(search_query) |
+                Students.first_name.contains(search_query)
+                ).filter(Students.gender == gender_filter).all()
+        elif filter =='course':
+            if search_query.isspace() or search_query =='':
+                return Students.query.filter(Students.gender == gender_filter).all()
+            course = Courses.query.filter(
+                Courses.course_name.contains(search_query)|
+                Courses.course_code.contains(search_query)).first()
+
+            course = course.course_code
+            return Students.query.filter(
+                Students.course_code == course).filter(Students.gender == gender_filter).all()
+            
+        else:
+            return Students.query.filter(
+                Students.id.contains(search_query)|
+                Students.last_name.contains(search_query)|
+                Students.first_name.contains(search_query)
+                ).filter(Students.gender == gender_filter).all()

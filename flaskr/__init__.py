@@ -37,8 +37,6 @@ def create_app():
     app.register_blueprint(colleges_view,url_prefix='/')
 
     
-
-
     with app.app_context():
         db.create_all()
 

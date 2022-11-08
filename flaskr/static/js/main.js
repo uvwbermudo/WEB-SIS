@@ -10,14 +10,16 @@ $('document').ready(function(){
     $('#course_filter').on('change',course_search)
     $('#student_searchbar').on('input', student_search)
     $('#student_filter').on('input', student_search)
+    $('#gender_filter').on('input', student_search)
 
     
 })
 
 
 function student_search(){
-    var search_query = $('#student_searchbar').val()
+    var search_query = $('#student_searchbar').val();
     var search_filter = $('#student_filter').val();
+    var gender_filter = $('#gender_filter').val();
     const student_thead = $('#student_thead');
     const student_tbody = $('#student_tbody');  
     const student_tc = $('#student_tc');
@@ -32,6 +34,7 @@ function student_search(){
         body: JSON.stringify({ 
             search_query: search_query,
             search_filter: search_filter,
+            gender_filter: gender_filter,
             }),
       }).then(response => (response.json()))
       .then(function(response){

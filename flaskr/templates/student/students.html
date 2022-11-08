@@ -25,12 +25,10 @@ text-light
             <div class="col-lg-2 p-1">
               <a href="/students" class="btn btn-secondary w-100 myshadow"  role="button" type="button" aria-disabled="true"><i class="bi-arrow-clockwise"></i> Refresh</a>
             </div>
-
-            <div class="col col-lg-2">
-            </div>
-            <div class="container col-lg-6 p-1">
+            
+            <div class="container col-lg-3 p-1">
               <div class="row">
-                  <div class="col-4 p-0 ps-2">
+                  <div class="col-6 p-0 ps-2">
                     <select name="searchfield" id="student_filter" class="form-select myshadow squarify">
                       <option selected> Filter by</option>
                       <option value="id">ID</option>
@@ -38,13 +36,23 @@ text-light
                       <option value="course">Course</option>
                     </select>
                   </div>
-                  <div class="col-8 p-0 px-1 pe-2">
-                    <input class="form-control myshadow squarify" type="search" placeholder="Search a student" aria-label="Search" name="searchbar" id="student_searchbar">
+                  
+                  <div class="col-6 p-0 px-1 pe-2">
+                    <select name="genderfilter" id="gender_filter" class="form-select myshadow squarify">
+                      <option value="all" selected> Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
                   </div>
               </div>
             </div>
-
             
+            <div class="col col-lg-5 p-1">  
+              <div class="container p-0 ps-2">
+                <input class="form-control myshadow squarify" type="search" placeholder="Search" aria-label="Search" name="searchbar" id="student_searchbar">
+              </div>
+            </div>
+
           </div> 
       </form>
   </div>
