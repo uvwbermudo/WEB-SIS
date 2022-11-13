@@ -8,6 +8,7 @@ class Students(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     year = db.Column(db.Integer(), nullable=False)
     gender = db.Column(db.String(6), nullable=False)
+    profile_pic = db.Column(db.String(240), nullable=True)
     course_code = db.Column(
         db.String(20),
         db.ForeignKey('courses.course_code', onupdate="CASCADE"), 

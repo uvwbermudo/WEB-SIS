@@ -16,6 +16,8 @@ python-dotenv = "*"
 flask-wtf = "*"
 wtforms = {extras = ["email"], version = "*"}
 wtforms-json = "*"
+cloudinary = "*"
+flask-uploads = "*"
 
 [dev-packages]
 

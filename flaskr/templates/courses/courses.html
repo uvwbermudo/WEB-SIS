@@ -61,6 +61,11 @@ text-light
           </div>
           <form action="/course-add" method="POST">
           <div class="modal-body">
+              {% if form.college.choices|length == 0 %}
+              <div class="contain d-flex justify-content-center">
+                <h5 class="text-danger">No colleges avaialable at the moment.</h5>
+              </div>
+              {% endif %}
               {{ form.course_code.label(class="form-label fw-semibold") }}
               {{ form.course_code(class="form-control") }}  
               <span></span>
@@ -141,7 +146,11 @@ text-light
                   <div class="modal-body">
                       {{ form.csrf_token }}
                       <input type="hidden" value="{{ course.course_code }}" id="hid" name="hid" style="padding: 0;">
-                      
+                      {% if form.college.choices|length == 0 %}
+                      <div class="contain d-flex justify-content-center">
+                        <h5 class="text-danger">No colleges avaialable at the moment.</h5>
+                      </div>
+                      {% endif %}
                       {{ form.course_code.label(class="form-label fw-semibold") }}
                       {% set course_code, course_name, college = course.course_code, course.course_name, course.college_code %}
                       {{ form.course_code(class="form-control", value=course_code) }}

@@ -3,7 +3,6 @@ const csrf = $('#csrf_token').val();
 
 
 $('document').ready(function(){
-    
     $('#college_searchbar').on('input', search_college)
     $('#college_filter').on('change', search_college)
     $('#course_searchbar').on('input',course_search)
@@ -11,7 +10,6 @@ $('document').ready(function(){
     $('#student_searchbar').on('input', student_search)
     $('#student_filter').on('input', student_search)
     $('#gender_filter').on('input', student_search)
-
     
 })
 
@@ -47,6 +45,9 @@ function student_search(){
             
             student_tbody.append(`
             <tr>
+            <td class="text-center"> 
+                <img src="${response[0][i][7]}" alt="${response[0][i][0]}_profile_picture" class="profile_pic" loading="lazy">
+            </td>
             <th scope="row" class="text-center">${response[0][i][0]}</th>
             <td>${response[0][i][1]}</td>
             <td>${response[0][i][2]}</td>
@@ -355,6 +356,8 @@ function verify_student(mode,hid=0) {
     year = $('div#addstudent #year')
     gender = $('div#addstudent #gender')
     course = $('div#addstudent #course')
+    profile_pic = $('div#addstudent #profile_pic')
+    modal_footer = $('div#addstudent .modal-footer')
     if (mode == 1){
         student_id = $('div#editstudent'+hid+' #id')
         last_name = $('div#editstudent'+hid+' #last_name')
@@ -362,6 +365,7 @@ function verify_student(mode,hid=0) {
         year = $('div#editstudent'+hid+' #year')
         gender = $('div#editstudent'+hid+' #gender')
         course = $('div#editstudent'+hid+' #course')
+        modal = $('div#editstudent'+hid)
     }
 
     fetch('/student-verify', {
@@ -382,16 +386,19 @@ function verify_student(mode,hid=0) {
             mode: mode,
             }),
         })
-        .then(response => {
+        .then(async response => {
             if (response.status == 299){
-                console.log('Successfully Added Student') 
+                console.log('Successfully Added Student')
+                wait_upload(modal_footer)
+                await upload_img(response.json(), profile_pic, mode, student_id)
                 location.reload()
                 return
-            } else if( response.status == 497){
+            } else if(response.status == 497){
                 console.log('Verified connection')
                 return
-            } 
+            } else {
             return response.json()
+            }
         })  
         .then(function(responses) {
             responses[1].forEach(function(field){
@@ -433,4 +440,64 @@ function set_selectfield(code,year,gender){
 
 function course_selectfield(college) {
     $('.set_college').val(college)
+}
+
+function wait_upload(modal_footer){
+   
+    modal_footer.prepend(`
+    <div class="spinner-border msu-text align-self-start" role="status">
+    <span class="visually-hidden">Loading...</span>
+    </div>
+    <span class="msu-text">Adding Student... </span>
+   
+    `)
+}
+
+
+async function upload_img(response,profile_pic, mode, student_id){
+    final_res = await response.then(async function(response) {
+        the_file = profile_pic.get(0).files[0]
+        formData = new FormData()
+        formData.append('file', the_file);
+        formData.append('public_id', response[0]['public_id']);
+        formData.append('api_key', response[0]['api_key']);
+        formData.append('signature', response[0]['signature']);
+        formData.append('folder', response[0]['folder']);
+        formData.append('timestamp', response[0]['timestamp'])
+        
+
+        result = await fetch('https://api.cloudinary.com/v1_1/bermudo-cloud/image/upload', {
+            method: 'POST',    
+            body: formData,
+        }).then(function(response){
+            console.log(response)
+            return response.json()
+        }).then(async function(response) {
+            console.log(response['secure_url'])
+
+            result = await fetch('/upload-profile', {
+            method: 'POST',     
+            headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrf
+            },
+            body: JSON.stringify({
+                profile_pic: response['secure_url'],
+                student_id: student_id.val()
+            }),
+            }).then((response) => {
+                if (response.status == 299){
+                    return response
+                }
+            })
+            console.log(result)
+            return result
+        })
+        console.log(result)
+        return result
+        
+
+    })
+    return final_res
+
 }

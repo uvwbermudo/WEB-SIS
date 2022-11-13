@@ -1,7 +1,8 @@
 from email import message
 from flask_wtf import FlaskForm
-from wtforms import StringField, validators, SubmitField, SelectField
+from wtforms import StringField, validators, FileField, SelectField
 from wtforms.validators import Length, DataRequired, Regexp
+from flask_wtf.file import FileRequired, FileAllowed
 
 
 
@@ -45,10 +46,16 @@ class AddStudent(FlaskForm):
                 ),
             ],
         )
+    profile_pic = FileField(
+        'Profile Picture', 
+        validators=[
+            FileAllowed(['jpg','png'], message='Can only upload .jpg or .png files')
+            ]
+        )
     year = SelectField('Year Level', choices=[1,2,3,4,5])
     gender = SelectField('Gender', choices = ['Male','Female'])
     course = SelectField('Course')    
-    submit = SubmitField("Submit")
+    
 
 
 

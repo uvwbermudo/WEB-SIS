@@ -135,4 +135,28 @@ table {
     font-weight: 600;
 }
 
+.profile_pic {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+}
+
+.profile_pic_larger {
+    height: 180px;
+    width: 180px;
+    border-radius: 50%;
+}
+
+.cover {
+    position:fixed;
+    padding:0;
+    margin:0;
+
+    top:0;
+    left:0;
+
+    width: 100%;
+    height: 100%;
+    background:rgba(255,255,255,0.5);
+}
 

@@ -7,6 +7,9 @@ from flaskr.courses.models import Courses
 from flaskr import get_error_items, get_form_fields
 import json
 import wtforms_json
+import time
+from hashlib import sha256
+from config import CLOUDINARY_API_CLOUD, CLOUDINARY_API_KEY, CLOUDINARY_API_CLOUD_FOLDER, CLOUDINARY_API_SECRET
 
 student_view = Blueprint('student_view', __name__)
 
@@ -76,7 +79,17 @@ def student_verify():
                 db.session.add(new_student)
                 db.session.commit()
                 flash(f'Successfully added "{id_number} - {"".join((last_name,first_name))}"')
-                return Response(status=299)
+                upload_params = {}
+                upload_params['timestamp'] = str(int(time.time()))
+                upload_params['public_id'] = id_number+ upload_params['timestamp']
+                upload_params['folder'] = str(CLOUDINARY_API_CLOUD_FOLDER)
+                upload_params['api_key'] = str(CLOUDINARY_API_KEY)
+                upload_params['api_secret'] = str(CLOUDINARY_API_SECRET)
+                signature=f"folder={upload_params['folder']}&public_id={upload_params['public_id']}&timestamp={upload_params['timestamp']}{upload_params['api_secret']}"
+                print(signature)
+                signature = sha256(signature.encode()).hexdigest()   
+                upload_params['signature']=signature
+                return Response(json.dumps([upload_params]),status=299)
 
         else:
             errors = get_error_items(form)
@@ -101,6 +114,19 @@ def student_delete():
         db.session.commit()
     return redirect(url_for('student_view.students'))
 
+@student_view.route('/upload-profile', methods=['POST'])
+def upload_profile():
+    if request.method == 'POST':
+        profile_url = request.json['profile_pic']
+        student = request.json['student_id']
+        print('ROUTED TO UPLOAD ', student,profile_url)
+        target = Students.query.get(student)
+        target.profile_pic=profile_url
+        db.session.commit()
+        target = Students.query.get(student)
+        print('TARGET NOW', target.profile_pic, target.first_name, target.last_name)
+        return Response(status=299)
+
 @student_view.route('/student-search', methods=['POST'])
 @login_required
 def student_search():
@@ -119,7 +145,7 @@ def col_to_list(list):
             course_name = student.course.course_name
         else:
             course_name = None
-        temp.append([student.id, student.last_name, student.first_name, course_name, student.year, student.gender, student.course.course_code])
+        temp.append([student.id, student.last_name, student.first_name, course_name, student.year, student.gender, student.course.course_code, student.profile_pic])
     return temp
 
 def searchbar_query(filter, search_query, gender_filter):  
