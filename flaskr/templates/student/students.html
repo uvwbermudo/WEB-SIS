@@ -62,7 +62,8 @@ text-light
 <form action="/student-add" method="POST">
   <div class="modal fade" id="addstudent" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered   modal-dialog-scrollable">
-        <div class="modal-content position-relative">
+        <div class="modal-content position-relative b-overlay">
+          
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="staticBackdropLabel">Add a Student</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -146,8 +147,12 @@ text-light
       {% for student in students %}
       {% set id, last_name, first_name, year, gender, course = student.id,student.last_name, student.first_name, student.year, student.gender, student.course_code %}
       <tr>
-          <td class="text-center"> 
+          <td class="text-center">
+            {% if student.profile_pic %}
             <img src="{{student.profile_pic}}" alt="{{student.id}}_profile_picture" class="profile_pic">
+            {% else %}
+            <img src="../../static/img/default_profile.jpeg" alt="{{student.id}}_profile_picture" class="profile_pic">
+            {% endif %}
           </td>
           <th scope="row" class="text-center">{{ student.id }}</th>
           <td>{{ student.last_name }}</td>
@@ -186,7 +191,26 @@ text-light
                         <h5 class="text-danger">No courses avaialable at the moment.</h5>
                       </div>
                       {% endif %}
-                      <div class="d-flex justify-content-center"><img src="{{student.profile_pic}}" alt="{{student.id}}_profile_picture" class="profile_pic_larger"></div>
+                    
+                      <div class="d-flex justify-content-center">
+                      
+                        <div class="b-ovr-pic">
+                          <label for="{{student.id}}_profile_picture">
+                            <div class="a-ovr-pic d-flex justify-content-center align-items-center flex-column">
+                              <i class="bi-camera-fill text-white"></i>
+                              <span class="text-white fw-semibold" for="{{student.id}}_profile_picture"> Change Photo</span>
+                              </label>
+                              <input type="file" id="{{student.id}}_profile_picture" class="d-none"
+                              onchange="change_profile(this,'{{student.id}}_profile_picturesrc')">
+                            </div>
+                          
+                            {% if student.profile_pic %}
+                            <img src="{{student.profile_pic}}" alt="{{student.id}}_profile_picture" class="profile_pic_larger" id="{{student.id}}_profile_picturesrc">
+                            {% else %}
+                            <img src="../../static/img/default_profile.jpeg" alt="{{student.id}}_profile_picture" class="profile_pic_larger" id="{{student.id}}_profile_picturesrc">
+                        {% endif %}
+                        </div>
+                      </div>
                       
                 
                       {{ form.id.label(class="form-label  fw-semibold") }}

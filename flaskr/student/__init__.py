@@ -46,6 +46,17 @@ def student_verify():
         check = Students.query.get(id_number)
         mode = request.json['mode']
         if form.validate_on_submit():
+            upload_params = {}      #setting up parameters for cloudinary upload
+            upload_params['timestamp'] = str(int(time.time()))
+            upload_params['public_id'] = id_number+ upload_params['timestamp']
+            upload_params['folder'] = str(CLOUDINARY_API_CLOUD_FOLDER)
+            upload_params['api_key'] = str(CLOUDINARY_API_KEY)
+            upload_params['api_secret'] = str(CLOUDINARY_API_SECRET)
+            signature=f"folder={upload_params['folder']}&public_id={upload_params['public_id']}&timestamp={upload_params['timestamp']}{upload_params['api_secret']}"
+            print(signature)
+            signature = sha256(signature.encode()).hexdigest()   
+            upload_params['signature']=signature
+            
             if mode == 1:               # mode = 1 is for editing
                 errors = get_error_items(form)
                 if check and check.id != old_id:
@@ -62,7 +73,8 @@ def student_verify():
                     target.course_code = course
                     db.session.commit()
                     flash(f'Successfully updated "{target}"')
-                    return Response(status=299)
+                    return Response(json.dumps([upload_params]),status=299)
+
                         
             if check:
                 errors = get_error_items(form)
@@ -79,16 +91,6 @@ def student_verify():
                 db.session.add(new_student)
                 db.session.commit()
                 flash(f'Successfully added "{id_number} - {"".join((last_name,first_name))}"')
-                upload_params = {}
-                upload_params['timestamp'] = str(int(time.time()))
-                upload_params['public_id'] = id_number+ upload_params['timestamp']
-                upload_params['folder'] = str(CLOUDINARY_API_CLOUD_FOLDER)
-                upload_params['api_key'] = str(CLOUDINARY_API_KEY)
-                upload_params['api_secret'] = str(CLOUDINARY_API_SECRET)
-                signature=f"folder={upload_params['folder']}&public_id={upload_params['public_id']}&timestamp={upload_params['timestamp']}{upload_params['api_secret']}"
-                print(signature)
-                signature = sha256(signature.encode()).hexdigest()   
-                upload_params['signature']=signature
                 return Response(json.dumps([upload_params]),status=299)
 
         else:
@@ -124,7 +126,6 @@ def upload_profile():
         target.profile_pic=profile_url
         db.session.commit()
         target = Students.query.get(student)
-        print('TARGET NOW', target.profile_pic, target.first_name, target.last_name)
         return Response(status=299)
 
 @student_view.route('/student-search', methods=['POST'])

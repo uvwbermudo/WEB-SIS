@@ -357,7 +357,7 @@ function verify_student(mode,hid=0) {
     gender = $('div#addstudent #gender')
     course = $('div#addstudent #course')
     profile_pic = $('div#addstudent #profile_pic')
-    modal_footer = $('div#addstudent .modal-footer')
+    cover = $('div#addstudent .modal-content')
     if (mode == 1){
         student_id = $('div#editstudent'+hid+' #id')
         last_name = $('div#editstudent'+hid+' #last_name')
@@ -366,6 +366,9 @@ function verify_student(mode,hid=0) {
         gender = $('div#editstudent'+hid+' #gender')
         course = $('div#editstudent'+hid+' #course')
         modal = $('div#editstudent'+hid)
+        profile_pic = $('div#editstudent'+hid+' #'+hid+'_profile_picture')
+        cover = $('div#confirm'+hid+' .modal-body')
+
     }
 
     fetch('/student-verify', {
@@ -388,9 +391,9 @@ function verify_student(mode,hid=0) {
         })
         .then(async response => {
             if (response.status == 299){
-                console.log('Successfully Added Student')
-                wait_upload(modal_footer)
-                await upload_img(response.json(), profile_pic, mode, student_id)
+                console.log('Successfully Verified Student')
+                wait_upload(cover, mode)
+                await upload_img(response.json(), profile_pic, student_id)
                 location.reload()
                 return
             } else if(response.status == 497){
@@ -442,19 +445,26 @@ function course_selectfield(college) {
     $('.set_college').val(college)
 }
 
-function wait_upload(modal_footer){
-   
-    modal_footer.prepend(`
-    <div class="spinner-border msu-text align-self-start" role="status">
-    <span class="visually-hidden">Loading...</span>
-    </div>
-    <span class="msu-text">Adding Student... </span>
-   
-    `)
+function wait_upload(parent, mode){
+    if (mode == 0){
+        parent.prepend(`
+        <div class="a-overlay">
+            <span class="msu-text loader d-flex align-items-center">Adding Student...<div class="spinner-border msu-text loader ms-2" role="status"></div></span>
+        </div>
+        `)
+    } else {
+        parent.prepend(`
+        <div class="a-overlay">
+            <span class="msu-text loader d-flex align-items-center">Saving Changes...<div class="spinner-border msu-text loader ms-2" role="status"></div></span>
+        </div>
+        `)
+    }
+    
+
 }
 
 
-async function upload_img(response,profile_pic, mode, student_id){
+async function upload_img(response,profile_pic, student_id){
     final_res = await response.then(async function(response) {
         the_file = profile_pic.get(0).files[0]
         formData = new FormData()
@@ -483,7 +493,7 @@ async function upload_img(response,profile_pic, mode, student_id){
             },
             body: JSON.stringify({
                 profile_pic: response['secure_url'],
-                student_id: student_id.val()
+                student_id: student_id.val(),
             }),
             }).then((response) => {
                 if (response.status == 299){
@@ -499,5 +509,10 @@ async function upload_img(response,profile_pic, mode, student_id){
 
     })
     return final_res
+}
 
+function change_profile(input, img_container){
+    var img = $('#'+img_container);
+    img_url= URL.createObjectURL(input.files[0]);
+    img.attr('src',img_url)
 }
