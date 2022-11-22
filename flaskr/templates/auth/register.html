@@ -5,10 +5,12 @@
 {% block body %}    
 <div class="container h-100 d-flex align-items-center justify-content-center">
     <div class="container align-items-center bg-white w-50 p-5 pt-3 myshadow">
-        <div class="container d-flex flex-column align-items-center justify-content-center">
+        <div class="container d-flex flex-column align-items-center justify-content-center" style="height: 150px;">
             <img class="img-fluid w-50" src="../../static/img/logo2.jpg" style="max-width: 150px; min-width: 100px;" alt="">
-            <br/>
-                <h5 class="text-muted">Create an account</h5>
+        </div>
+        <br/>
+        <div class="d-flex justify-content-center">
+            <h5 class="text-muted text-center align-self-end">Create an account</h5>
         </div>
         {% block form %}
         <form method="POST">

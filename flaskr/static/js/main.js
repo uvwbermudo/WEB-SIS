@@ -10,8 +10,10 @@ $('document').ready(function(){
     $('#student_searchbar').on('input', student_search)
     $('#student_filter').on('input', student_search)
     $('#gender_filter').on('input', student_search)
+    $('.profile_pic').on('click', expand_img)
     
 })
+
 
 
 function student_search(){
@@ -42,11 +44,24 @@ function student_search(){
              course = response[0][i][6]
              year = response[0][i][4]
              gender = response[0][i][5]
-            
+             if (response[0][i][7]){
+                img_src = response[0][i][7]
+             } else {
+                img_src = '../../static/img/default_profile.jpeg'
+             }
+             
             student_tbody.append(`
             <tr>
             <td class="text-center"> 
-                <img src="${response[0][i][7]}" alt="${response[0][i][0]}_profile_picture" class="profile_pic" loading="lazy">
+              <div class="d-flex justify-content-center p-0 "> 
+                <div class="b-ovr-pic p-0">
+                     <a type="button" style="text-decoration: none;" class="a-ovr-pic d-flex justify-content-center align-items-center flex-column p-0 m-0" data-bs-target="#student-picture${response[0][i][0]}" data-bs-toggle="modal">
+                     <i class="bi-eye text-light" style="font-size: 18px"></i>
+                     <span class="text-light"style="font-size: 12px;">View</span>
+                     </a>
+                     <img src="${img_src}" alt="${response[0][i][0]}_profile_picture" class="profile_pic" loading="lazy">
+                </div>
+              </div>
             </td>
             <th scope="row" class="text-center">${response[0][i][0]}</th>
             <td>${response[0][i][1]}</td>
@@ -329,6 +344,7 @@ function verify_course(mode,hid=0) {
                         
                         formfield = $('div#editcourse'+hid+' #'+field)
                     }
+
                     formfieldnext = formfield.next();
                     formfield.css({"border-color":"red"});
                     formfieldnext.html('');
@@ -404,6 +420,7 @@ function verify_student(mode,hid=0) {
             }
         })  
         .then(function(responses) {
+            var scrolled = false;
             responses[1].forEach(function(field){
                 if (field == 'year' || field == 'gender' || field == 'course'){
                     return
@@ -415,6 +432,18 @@ function verify_student(mode,hid=0) {
                         $('div#confirm'+hid+' #back').click(); 
                         
                         formfield = $('div#editstudent'+hid+' #'+field)
+                        if (!scrolled){
+                            $('.verify-student-modal').animate({
+                                scrollTop: '+=150px'
+                            });     
+                            scrolled = true;
+                        }
+                    }
+                    if (!scrolled){
+                        $('.verify-student-modal').animate({
+                            scrollTop: formfield.offset().top
+                        });     
+                        scrolled = true;
                     }
                     formfieldnext = formfield.next();
                     formfield.css({"border-color":"red"});

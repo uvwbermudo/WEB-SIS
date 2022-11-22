@@ -61,7 +61,7 @@ text-light
 <!-- ADD STUDENT -->
 <form action="/student-add" method="POST">
   <div class="modal fade" id="addstudent" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered   modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content position-relative b-overlay">
           
           <div class="modal-header">
@@ -69,7 +69,7 @@ text-light
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           
-          <div class="modal-body position-relative">
+          <div class="modal-body verify-student-modal">
               {% if form.course.choices|length == 0 %}
               <div class="contain d-flex justify-content-center">
                 <h5 class="text-danger">No courses avaialable at the moment.</h5>
@@ -148,11 +148,19 @@ text-light
       {% set id, last_name, first_name, year, gender, course = student.id,student.last_name, student.first_name, student.year, student.gender, student.course_code %}
       <tr>
           <td class="text-center">
-            {% if student.profile_pic %}
-            <img src="{{student.profile_pic}}" alt="{{student.id}}_profile_picture" class="profile_pic">
-            {% else %}
-            <img src="../../static/img/default_profile.jpeg" alt="{{student.id}}_profile_picture" class="profile_pic">
-            {% endif %}
+            <div class="d-flex justify-content-center p-0 ">  
+              <div class="b-ovr-pic p-0">
+                <a type="button" class="text-white a-ovr-pic d-flex justify-content-center align-items-center flex-column p-0 m-0" style="text-decoration: none;" data-bs-target="#student-picture{{student.id}}" data-bs-toggle="modal">
+                  <i class="bi-eye text-light" style="font-size: 18px"></i>
+                  <span class="text-light"style="font-size: 12px;">View</span>
+                </a>
+                {% if student.profile_pic %}
+                <img src="{{student.profile_pic}}" alt="{{student.id}}_profile_picture" class="profile_pic">
+                {% else %}
+                <img src="../../static/img/default_profile.jpeg" alt="{{student.id}}_profile_picture" class="profile_pic">
+                {% endif %}
+              </div>
+            </div>
           </td>
           <th scope="row" class="text-center">{{ student.id }}</th>
           <td>{{ student.last_name }}</td>
@@ -183,7 +191,7 @@ text-light
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   
-                  <div class="modal-body">
+                  <div class="verify-student-modal modal-body">
                       <input type="hidden" value="{{ student.id }}" id="hid" name="hid" style="padding: 0;">
                       
                       {% if form.course.choices|length == 0 %}
@@ -298,7 +306,22 @@ text-light
         </div>
       </div>
     </form>
-    
+
+    <!-- PictureModal -->
+    <div class="modal fade" id="student-picture{{student.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content msuify">
+          <div class="modal-body text-center">   
+            {% if student.profile_pic %}
+            <img src="{{student.profile_pic}}" alt="{{student.id}}_profile_picture" class="w-100">
+            {% else %}
+            <img src="../../static/img/default_profile.jpeg" alt="{{student.id}}_profile_picture" class="w-100">
+            {% endif %}    
+          </div>
+        </div>
+      </div>
+    </div>
+        
     {% endfor %}
       </tbody>
     </table>
