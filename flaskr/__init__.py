@@ -21,7 +21,7 @@ def create_app():
     db.init_app(app)
     CSRFProtect(app)
 
-    from .auth import auth
+    from .auth import auth, page_not_found
     from .student import student_view
     from .courses import courses_view
     from .colleges import colleges_view
@@ -35,6 +35,7 @@ def create_app():
     app.register_blueprint(student_view,url_prefix='/')
     app.register_blueprint(courses_view,url_prefix='/')
     app.register_blueprint(colleges_view,url_prefix='/')
+    app.register_error_handler(404, page_not_found)
 
     
     with app.app_context():
