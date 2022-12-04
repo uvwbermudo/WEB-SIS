@@ -1,15 +1,15 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session, Response
 from flask_login import current_user, login_user, login_required, logout_user
-from flaskr import db
 from .models import Students
 from .forms import AddStudent
 from flaskr.courses.models import Courses
-from flaskr import get_error_items, get_form_fields
+from flaskr import get_error_items, get_form_fields, mysql
 import json
 import wtforms_json
 import time
 from hashlib import sha256
 from config import CLOUDINARY_API_CLOUD, CLOUDINARY_API_KEY, CLOUDINARY_API_CLOUD_FOLDER, CLOUDINARY_API_SECRET
+import mysql.connector as mcr
 
 student_view = Blueprint('student_view', __name__)
 
@@ -18,11 +18,11 @@ student_view = Blueprint('student_view', __name__)
 @login_required
 def students():
     form = AddStudent(request.form)
-    courses = Courses.query.all()
-    courses = [(course.course_code,course.course_name) for course in courses]
+    courses = Courses.query_all()
+    courses = [(course['course_code'],course['course_name']) for course in courses]
     form.course.choices = courses
     session['course_choices'] = courses
-    students = Students.query.all()
+    students = Students.query_all()
 
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
@@ -43,7 +43,7 @@ def student_verify():
         gender = request.json['gender']
         course = request.json['course']
         old_id = request.json['hid']
-        check = Students.query.get(id_number)
+        check = Students.query_get(id=id_number)
         mode = request.json['mode']
         if form.validate_on_submit():
             upload_params = {}      #setting up parameters for cloudinary upload
@@ -59,23 +59,25 @@ def student_verify():
             
             if mode == 1:               # mode = 1 is for editing
                 errors = get_error_items(form)
-                if check and check.id != old_id:
+                if check and check['id'] != old_id:
                     errors['id']= ['ID Number is already being used.']
                     return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
-            
                 else:
-                    target = Students.query.get(old_id)
-                    target.id = id_number
-                    target.last_name = last_name
-                    target.first_name = first_name
-                    target.year = year
-                    target.gender = gender
-                    target.course_code = course
-                    db.session.commit()
-                    flash(f'Successfully updated "{target}"')
+                    target_id = old_id
+                    target = Students.query_get(target_id)
+                    Students.update(
+                        old_id=old_id,
+                        new_course=course,
+                        new_year_level=year,
+                        new_fname=first_name,
+                        new_gender=gender,
+                        new_lname=last_name,
+                        new_id=id_number
+                        )
+                    mysql.connection.commit()
+                    flash(f"Successfully updated {target['id']} - {target['last_name']}, {target['first_name']}")
                     return Response(json.dumps([upload_params]),status=299)
-
-                        
+   
             if check:
                 errors = get_error_items(form)
                 errors['id'] = ['Id Number is already being used.']
@@ -88,15 +90,15 @@ def student_verify():
                     gender=gender, 
                     course_code=course,
                     )
-                db.session.add(new_student)
-                db.session.commit()
+                new_student.add()
+                mysql.connection.commit()
                 flash(f'Successfully added "{id_number} - {"".join((last_name,first_name))}"')
                 return Response(json.dumps([upload_params]),status=299)
 
         else:
             errors = get_error_items(form)
             if mode == 1:
-                if check and check.id != old_id:
+                if check and check['id'] != old_id:
                     errors['id']= ['ID Number is already being used.']
             else:
                 if check:
@@ -109,11 +111,11 @@ def student_verify():
 @login_required
 def student_delete():
     if request.method == 'POST':
-        target = request.form.get('hid')
-        target = Students.query.get(target)
-        flash(f'''Deleted "{', '.join((target.last_name,target.first_name))}" successfully''', category='success')
-        db.session.delete(target)
-        db.session.commit()
+        target_id= request.form.get('hid')
+        target = Students.query_get(target_id)
+        flash(f"Deleted {target['last_name']}, {target['first_name']} successfully", category='success')
+        Students.delete_student(target_id)
+        mysql.connection.commit()
     return redirect(url_for('student_view.students'))
 
 @student_view.route('/upload-profile', methods=['POST'])
@@ -121,11 +123,8 @@ def upload_profile():
     if request.method == 'POST':
         profile_url = request.json['profile_pic']
         student = request.json['student_id']
-        print('ROUTED TO UPLOAD ', student,profile_url)
-        target = Students.query.get(student)
-        target.profile_pic=profile_url
-        db.session.commit()
-        target = Students.query.get(student)
+        Students.update_pfp(id=student, url=profile_url)        
+        mysql.connection.commit()
         return Response(status=299)
 
 @student_view.route('/student-search', methods=['POST'])
@@ -142,65 +141,32 @@ def student_search():
 def col_to_list(list):
     temp = []
     for student in list:
-        if student.course_code:
-            course_name = student.course.course_name
+        if student['course_code']:
+            course_name = student['course_name']
         else:
             course_name = None
-        temp.append([student.id, student.last_name, student.first_name, course_name, student.year, student.gender, student.course.course_code, student.profile_pic])
+        temp.append([
+            student['id'],
+            student['last_name'],
+            student['first_name'],
+            course_name,
+            student['year_level'],
+            student['gender'], 
+            student['course_code'],
+            student['profile_pic']
+            ])
     return temp
 
 def searchbar_query(filter, search_query, gender_filter):  
-    if gender_filter == 'all':
-        if filter == 'id':
-            return Students.query.filter(
-                Students.id.contains(search_query)
-                ).all()
-        elif filter == 'name':
-            return Students.query.filter(
-                Students.last_name.contains(search_query) |
-                Students.first_name.contains(search_query)
-                ).all()
-        elif filter =='course':
-            if search_query.isspace() or search_query =='':
-                return Students.query.all()
-            course = Courses.query.filter(
-                Courses.course_name.contains(search_query)|
-                Courses.course_code.contains(search_query)).first()
-
-            course = course.course_code
-            return Students.query.filter(
-                Students.course_code == course).all()
-            
-        else:
-            return Students.query.filter(
-                Students.id.contains(search_query)|
-                Students.last_name.contains(search_query)|
-                Students.first_name.contains(search_query)
-                ).all()
+    if search_query.isspace() or search_query =='':
+        return Students.query_all(gender=gender_filter)
+    if filter == 'id':
+        return Students.query_filter(id=search_query, search_pattern=True, gender=gender_filter)
+    elif filter == 'name':
+        return Students.query_filter(name=search_query, search_pattern=True, gender=gender_filter)
+    elif filter =='course':
+        course = Courses.query_filter(all=search_query, search_pattern=True)[0]
+        course = course['course_code']
+        return Students.query_filter(course=course, search_pattern=True, gender=gender_filter)
     else:
-        if filter == 'id':
-            return Students.query.filter(
-                Students.id.contains(search_query)
-                ).filter(Students.gender == gender_filter).all()
-        elif filter == 'name':
-            return Students.query.filter(
-                Students.last_name.contains(search_query) |
-                Students.first_name.contains(search_query)
-                ).filter(Students.gender == gender_filter).all()
-        elif filter =='course':
-            if search_query.isspace() or search_query =='':
-                return Students.query.filter(Students.gender == gender_filter).all()
-            course = Courses.query.filter(
-                Courses.course_name.contains(search_query)|
-                Courses.course_code.contains(search_query)).first()
-
-            course = course.course_code
-            return Students.query.filter(
-                Students.course_code == course).filter(Students.gender == gender_filter).all()
-            
-        else:
-            return Students.query.filter(
-                Students.id.contains(search_query)|
-                Students.last_name.contains(search_query)|
-                Students.first_name.contains(search_query)
-                ).filter(Students.gender == gender_filter).all()
+        return Students.query_filter(all=search_query, search_pattern=True, gender=gender_filter)

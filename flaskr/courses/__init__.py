@@ -2,13 +2,14 @@
 from sqlalchemy import exc
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session, Response
 from flask_login import current_user, login_user, login_required, logout_user
-from flaskr import db
 from .forms import AddCourse
 from flaskr.colleges.models import Colleges
-from flaskr import get_error_items, get_form_fields
+from flaskr import get_error_items, get_form_fields, mysql
 from .models import Courses
 import json
 import wtforms_json
+import mysql.connector as mcr
+
 
 
 courses_view = Blueprint('courses_view', __name__)
@@ -20,11 +21,11 @@ def courses():
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
     form = AddCourse(request.form)
-    colleges = Colleges.query.all()
-    colleges = [(college.college_code,college.college_name) for college in colleges]
+    colleges = Colleges.query_all()
+    colleges = [(college['college_code'],college['college_name']) for college in colleges]
     form.college.choices = colleges
     session['college_choices'] = colleges
-    courses = Courses.query.all()
+    courses = Courses.query_all()
             
     return render_template('courses/courses.html', form=form, courses=courses, college_choices=colleges)
 
@@ -40,30 +41,33 @@ def course_verify():
         course_code = request.json['course_code']
         college = request.json['college']
         old_code = request.json['hid']
-        check = Courses.query.get(course_code)
-        check_name = Courses.query.filter(Courses.course_name==course_name).first()
+        check = Courses.query_get(course_code)
+        check_name = Courses.query_filter(course_name=course_name)
         mode = request.json['mode']
         if form.validate_on_submit():
             if mode == 1:               # mode = 1 is for editing
                 errors = get_error_items(form)
-                if check and check.course_code != old_code:
+                if check and check['course_code'] != old_code:
                     errors['course_code']= ['Course Code is already being used.']
-                    if check_name and check_name.course_code != old_code:
+                    if check_name and check_name[0]['course_code'] != old_code:
                         errors['course_name']= ['Course name is already being used.']
                     return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
             
                 else:
-                    target = Courses.query.get(old_code)
-                    target.course_code = course_code
-                    target.course_name = course_name
+                    target = Courses.query_get(old_code)
                     try: 
-                        db.session.commit()
-                    except exc.IntegrityError as e:
-                        print(e)
+                        Courses.update(
+                            old_code=old_code,
+                            new_code=course_code,
+                            new_name=course_name,
+                            new_college=college
+                        )
+                        mysql.connection.commit()
+                    except mcr.IntegrityError as e:
                         errors['course_name']= ['Course name is already being used.']
                         return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
                     else:
-                        flash(f'Successfully updated "{target}"')
+                        flash(f"Successfully updated {target['course_code']} - {target['course_name']} ")
                     return Response(status=299)
 
             if check:
@@ -78,10 +82,10 @@ def course_verify():
                     course_code=course_code, 
                     college_code=college,
                     )   
-                db.session.add(new_course)
                 try:
-                    db.session.commit()
-                except exc.IntegrityError:
+                    new_course.add()
+                    mysql.connection.commit()
+                except mcr.IntegrityError:
                     errors = get_error_items(form)
                     errors['course_name']= ['Course name is already being used.']
                     return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
@@ -94,9 +98,9 @@ def course_verify():
 
 
             if mode == 1:
-                if check and check.course_code != old_code:
+                if check and check['course_code'] != old_code:
                     errors['course_code']= ['Course Code is already being used.']
-                if check_name and check_name.course_code != old_code:
+                if check_name and check_name[0]['course_code'] != old_code:
                     errors['course_name']= ['Course name is already being used.']
             else:
                 if check:
@@ -104,7 +108,6 @@ def course_verify():
                 if check_name:
                     errors['course_name']= ['Course name is already being used.']
 
-            
             return Response(json.dumps([errors, fields]), status=298, mimetype='application/json')
     
 
@@ -112,11 +115,11 @@ def course_verify():
 @login_required
 def course_delete():
     if request.method == 'POST':
-        target = request.form.get('hid')
-        target = Courses.query.get(target)
-        flash(f'Deleted "{target.course_name}" successfully', category='success')
-        db.session.delete(target)
-        db.session.commit()
+        target_id = request.form.get('hid')
+        target = Courses.query_get(target_id)
+        Courses.delete_course(target_id)
+        flash(f"Deleted {target['course_name']} successfully", category='success')
+        mysql.connection.commit()
     return redirect(url_for('courses_view.courses'))
 
 @courses_view.route('/course-search', methods=['POST'])
@@ -133,36 +136,25 @@ def course_search():
 def col_to_list(list):
     temp = []
     for course in list:
-        if course.college:
-            college_name = course.college.college_name
-            college_code = course.college.college_code
+        if course['college_code']:
+            college_name = course['college_name']
+            college_code = course['college_code']
         else:
             college_name = None
-        temp.append([course.course_code, course.course_name, college_name, college_code])
+        temp.append([course['course_code'], course['course_name'], college_name, college_code])
     return temp
 
 
 def searchbar_query(filter, search_query):
+    if search_query.isspace() or search_query =='':
+            return Courses.query_all()
     if filter == 'course_code':
-        return Courses.query.filter(
-            Courses.course_code.contains(search_query)
-            ).all()
+        return Courses.query_filter(course_code=search_query, search_pattern=True)
     elif filter == 'course_name':
-        return Courses.query.filter(
-            Courses.course_name.contains(search_query)
-            ).all() 
+                return Courses.query_filter(course_name=search_query, search_pattern=True)
     elif filter == 'college':
-        if search_query.isspace() or search_query =='':
-            return Courses.query.all()
-        college = Colleges.query.filter(
-            Colleges.college_name.contains(search_query)|
-            Colleges.college_code.contains(search_query)).first()
-
-        college = college.college_code
-        return Courses.query.filter(
-            Courses.college_code == college).all()
+        college = Colleges.query_filter(all=search_query, search_pattern=True)[0]
+        college = college['college_code']
+        return Courses.query_filter(college_code=college, search_pattern=True)
     else:
-        return Courses.query.filter(
-            Courses.course_code.contains(search_query)|
-            Courses.course_name.contains(search_query)
-            ).all()
+        return Courses.query_filter(all=search_query, search_pattern=True)

@@ -3,8 +3,8 @@ from unicodedata import category
 from flask import Blueprint, render_template, request, flash, redirect, url_for, Response
 from flask_login import current_user, login_user, login_required, logout_user
 from . forms import RegisterForm, UserForm
-from . models import User
-from flaskr import db
+from . models import User, CurrentUser
+from flaskr import mysql
 from flaskr import get_error_items, get_form_fields
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
@@ -36,11 +36,12 @@ def login():
         if form.validate_on_submit():
             email = request.json['email']
             password = request.json['password']
-            user = User.query.filter_by(email=email).first()
+            user = User.query_filter_by(email=email)
             
             if user:
-                if check_password_hash(user.password, password):
-                    login_user(user)
+                if check_password_hash(user['user_password'], password):
+                    my_current_user = User.query_current_user(user['email'])
+                    login_user(my_current_user)
                     flash('Logged in successfully', category='success')
                     return Response(status=299)
                 errors = get_error_items(form)
@@ -52,7 +53,6 @@ def login():
                 errors['email'] = ['Email does not exist']
                 return Response(json.dumps([errors, fields]), status=499, mimetype='application/json')
         else:
-            print(fields)
             errors = get_error_items(form)
             return Response(json.dumps([errors, fields]), status=499, mimetype='application/json')
  
@@ -74,7 +74,7 @@ def register_user():
     if request.method == 'POST':
         email = request.json['email']
         password = request.json['password']
-        user = User.query.filter_by(email=email).first()
+        user = User.query_filter_by(email=email)
         if form.validate():
             if user:
                 errors = get_error_items(form)
@@ -84,8 +84,8 @@ def register_user():
                 email=email, 
                 password=generate_password_hash(password,method='sha256')
                 )
-            db.session.add(new_user)
-            db.session.commit()
+            new_user.add()
+            mysql.connection.commit()
             flash('Successfuly created an account! Please log in.', category='success')
             return Response(status=299)
         else:
@@ -97,7 +97,6 @@ def register_user():
 
 
 @auth.route('/logout', methods=['GET','POST'])
-@login_required
 def logout():
     logout_user()
     return redirect('/')

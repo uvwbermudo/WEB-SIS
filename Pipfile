@@ -18,6 +18,9 @@ wtforms = {extras = ["email"], version = "*"}
 wtforms-json = "*"
 cloudinary = "*"
 flask-uploads = "*"
+pip = "*"
+install = "*"
+flask-mysql-connector = "*"
 
 [dev-packages]
 

@@ -44,6 +44,7 @@ text-light
                       <option value="female">Female</option>
                     </select>
                   </div>
+                <button type="submit" disabled style="display: none" aria-hidden="true"></button>
               </div>
             </div>
             
@@ -145,7 +146,7 @@ text-light
 
       <tbody class="" id="student_tbody">
       {% for student in students %}
-      {% set id, last_name, first_name, year, gender, course = student.id,student.last_name, student.first_name, student.year, student.gender, student.course_code %}
+      {% set id, last_name, first_name, year, gender, course = student.id,student.last_name, student.first_name, student.year_level, student.gender, student.course_code %}
       <tr>
           <td class="text-center">
             <div class="d-flex justify-content-center p-0 ">  
@@ -165,12 +166,12 @@ text-light
           <th scope="row" class="text-center">{{ student.id }}</th>
           <td>{{ student.last_name }}</td>
           <td>{{ student.first_name }}</td>
-          {% if student.course %}
-          <td>{{ student.course.course_name }}</td>
+          {% if student.course_code %}
+          <td>{{ student.course_name }}</td>
           {% else %}
           <td> <p class="fst-italic fw-light my-auto h-50">Course Removed</p> </td>
           {% endif %}
-          <td class ="text-center">{{ student.year }}</td>
+          <td class ="text-center">{{ student.year_level}}</td>
           <td class ="text-center">{{ student.gender }}</td>
 
           <td class="pe-0 text-center">

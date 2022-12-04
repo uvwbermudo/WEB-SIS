@@ -39,6 +39,7 @@ text-light
                       <option value="college">College</option>
                     </select>
                   </div>
+                  <button type="submit" disabled style="display: none" aria-hidden="true"></button>
                   <div class="col-8 p-0 px-1 pe-2">
                     <input class="form-control myshadow squarify" type="search" placeholder="Search a Course" aria-label="Search" name="course_searchbar" id="course_searchbar">
                   </div>
@@ -118,15 +119,15 @@ text-light
       <tr>
           <th scope="row" class="text-center">{{ course.course_code }}</th>
           <td>{{ course.course_name }}</td>
-          {% if course.college %}
-          <td>{{ course.college.college_name }}</td>
+          {% if course.college_code %}
+          <td>{{ course.college_name }}</td>
           {% else %}
           <td> <p class="fst-italic fw-light my-auto h-50">College Removed</p> </td>
           {% endif %}
           <script>
           </script>
           <td class="pe-0 text-center">
-              <a href="/course-edit/{{course.course_code}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcourse{{course.course_code}}" style="width: 100px;" onmouseover="course_selectfield('{{course.college.college_code}}')"><i class="bi-pencil-fill"></i></a>
+              <a href="/course-edit/{{course.course_code}}"class="btn btn-warning btn-sm my-1" role="button" aria-pressed="true" data-bs-toggle="modal" data-bs-target="#editcourse{{course.course_code}}" style="width: 100px;" onmouseover="course_selectfield('{{course.college_code}}')"><i class="bi-pencil-fill"></i></a>
 
               <a href="/course-delete/{{course.course_code}}" class="btn btn-danger btn-sm my-1" role="button" aria-pressed="true" style="width: 100px;" data-bs-target="#confirmdelete{{course.course_code}}" data-bs-toggle="modal"><i class="bi-trash-fill"></i></a>
 

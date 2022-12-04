@@ -1,0 +1,10 @@
+
+
+
+
+class Foo():
+    base = 'huh'
+    def __init__(self, name):
+        self.name = name
+
+print(Foo().base)
